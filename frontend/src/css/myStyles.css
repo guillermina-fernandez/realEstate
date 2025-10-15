@@ -1,0 +1,72 @@
+.centered-placeholder::placeholder {
+  text-align: center;
+}
+
+td {
+    white-space: pre-line;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  table-layout: auto;
+}
+
+.custom-table th,
+.custom-table td {
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+.custom-table th {
+  background-color: #d6dbdf;
+}
+
+.custom-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.custom-fix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  table-layout: auto;
+}
+
+.custom-fix-table th,
+.custom-fix-table td {
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.custom-fix-table th {
+  background-color: #d6dbdf;
+  white-space: nowrap;
+  min-width: 0;
+  width: 1%; /* Encourages minimal width */
+}
+
+.custom-fix-table th:empty {
+  width: 0; /* Force empty th elements to take no space */
+  padding: 0.3rem 0;
+}
+
+.custom-fix-table td {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px; /* Tighter max-width for taxTbl with more columns */
+  word-wrap: break-word;
+}
+
+.custom-fix-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
