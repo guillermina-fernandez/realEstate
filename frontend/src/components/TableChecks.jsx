@@ -24,7 +24,6 @@ function TableChecks({ objs, onSelectionChange, initialData}) {
         });
     };
     
-    console.log(initialData, itemsChecked)
     return (
         <div className="w-100 border border-secondary p-2" style={{ height: '150px', overflowY: 'scroll', display: 'block' }}>
             <table className="custom-table mt-3">

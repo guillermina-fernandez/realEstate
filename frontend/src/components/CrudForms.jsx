@@ -343,7 +343,6 @@ function FormRent({ obj_id, formRef, initialData }) {
 
 function FormRentStep({ obj_id, formRef, initialData }) {
     const { register, onSubmit } = useFormHandler(initialData);
-    console.log(obj_id)
     return (
         <form ref={formRef} onSubmit={onSubmit}>
             <div>
