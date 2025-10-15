@@ -42,6 +42,11 @@ const modelConfig = {
         columns: ['DESDE', 'HASTA', 'IMPORTE', 'OBS'],
         searchBy: [''],
         sortBy: ['date_from', 'date_to']
+    },
+    gasto: {
+        columns: ['FECHA', 'DETALLE', 'IMPORTE'],
+        searchBy: [''],
+        sortBy: ['payment_date']
     }
 }
 

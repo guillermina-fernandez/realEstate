@@ -8,10 +8,10 @@ from django.db.models import ProtectedError, RestrictedError
 
 from common.validators import normalize_form_data
 
-from .serializers import get_serializer_class, RealEstateCustomSerializer
+from api.serializers import get_serializer_class, RealEstateCustomSerializer
 
 from parameters.models import Owner, Tenant, RealEstateType, TaxType
-from realestates.models import RealEstate, Tax, Rent, RentStep
+from realestates.models import RealEstate, Tax, Rent, RentStep, Expense
 
 models_dic = {
     'propietario': Owner,
@@ -22,6 +22,7 @@ models_dic = {
     'impuesto': Tax,
     'alquiler': Rent,
     'escalon': RentStep,
+    'gasto': Expense,
 }
 
 

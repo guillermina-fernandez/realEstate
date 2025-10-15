@@ -13,7 +13,7 @@ function FormOwner({ formRef, initialData }) {
             <div className="hstack">
                 <div className="w-100">
                     <label htmlFor="lastName">APELLIDO</label>
-                    <input className="form-control form-control-sm" id="lastName" name="lastName" {...register('last_name')} required/>
+                    <input className="form-control form-control-sm" id="lastName" name="lastName" {...register('last_name')} required autoFocus/>
                 </div>
                 <div className="w-100 ms-2">
                     <label htmlFor="firstName">NOMBRE</label>
@@ -37,7 +37,7 @@ function FormReType({ formRef, initialData }) {
         <form ref={formRef} onSubmit={onSubmit}>
             <div className="w-100">
                 <label htmlFor='re_type'>TIPO DE PROPIEDAD</label>
-                <input className="form-control form-control-sm" id="re_type" name="re_type" {...register('re_type')} required/>
+                <input className="form-control form-control-sm" id="re_type" name="re_type" {...register('re_type')} required autoFocus/>
             </div>
         </form>
     )
@@ -105,7 +105,7 @@ function FormRealEstate({ formRef, initialData}) {
         <form ref={formRef} onSubmit={(onSubmit)}>
             <div className='w-100'>
                 <label htmlFor="re_type">TIPO</label>
-                <select className="form-select form-select-sm" id="re_type" name="re_type" {...register('re_type')} defaultValue="" required>
+                <select className="form-select form-select-sm" id="re_type" name="re_type" {...register('re_type')} defaultValue="" required autoFocus>
                     <option key="0" value="" disabled></option>
                     {reTypes && reTypes.map((opt) => (
                         <option key={opt.id} value={opt.id}>{opt.re_type}</option>
@@ -216,7 +216,7 @@ function FormTax({ obj_id, formRef, initialData }) {
             </div>
             <div className="w-100">
                 <label htmlFor='tax_type'>TIPO</label>
-                <select className='form-select form-select-sm' id='tax_type' name='tax_type' {...register("tax_type", {onChange: (e) => handleChange(e.target.value)})} required>
+                <select className='form-select form-select-sm' id='tax_type' name='tax_type' {...register("tax_type", {onChange: (e) => handleChange(e.target.value)})} required autoFocus>
                     <option value="" disabled></option>
                     {taxTypes && taxTypes.map(item => (
                         <option key={item.id} value={item.id}>{item.tax_type}</option>
@@ -257,7 +257,7 @@ function FormTaxType({ formRef, initialData }) {
         <form ref={formRef} onSubmit={onSubmit}>
             <div className="w-100">
                 <label htmlFor='tax_type'>TIPO DE IMPUESTO</label>
-                <input className='form-control form-control-sm' id='tax_type' name='tax_type' {...register('tax_type')} required/>
+                <input className='form-control form-control-sm' id='tax_type' name='tax_type' {...register('tax_type')} required autoFocus/>
             </div>
         </form>
     )
@@ -313,7 +313,7 @@ function FormRent({ obj_id, formRef, initialData }) {
             <div className='hstack w-100'>
                 <div className='w-100'>
                     <label htmlFor='date_from'>FECHA INICIO</label>
-                    <input className='form-control form-control-sm' type='date' id='date_from' name='date_from' {...register('date_from')} />
+                    <input className='form-control form-control-sm' type='date' id='date_from' name='date_from' {...register('date_from')} autoFocus/>
                 </div>
                 <div className='w-100 ms-2'>
                     <label htmlFor='date_to'>FECHA HASTA</label>
@@ -353,7 +353,7 @@ function FormRentStep({ obj_id, formRef, initialData }) {
             <div className='hstack w-100'>
                 <div className='w-100'>
                     <label htmlFor='date_from'>FECHA DESDE</label>
-                    <input className='form-control form-control-sm' type='date' id='date_from' name='date_from' {...register('date_from')} />
+                    <input className='form-control form-control-sm' type='date' id='date_from' name='date_from' {...register('date_from')} autoFocus/>
                 </div>
                 <div className='w-100 ms-2'>
                     <label htmlFor='date_to'>FECHA HASTA</label>

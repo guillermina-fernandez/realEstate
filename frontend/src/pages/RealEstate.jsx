@@ -271,6 +271,54 @@ function Rent({obj_id}) {
 }
 
 
+function Expenses() {
+    const { modelName, modelData, openModal, showModal, handleDelete, setEditObj, modelConfig } = useDataContext();
+    const [expData, setExpData] = useState([])
+
+    useEffect(() => {
+        modelData && Array.isArray(modelData) && setExpData(modelData)
+    }, [modelData])
+
+    const cols = modelConfig[modelName]['columns'];
+
+    const handleEdit = (editObj) => {
+        openModal('edit');
+        setEditObj(editObj)
+    }
+
+    return (
+        <>
+            {showModal && <Modal obj_id={obj_id} />}
+            <div className="hstack">
+                <h4>GASTOS</h4>
+                <button type="button" className="btn btn-primary btn-sm mb-2 ms-3" onClick={() => openModal('new')}>+</button>
+            </div>
+            <table className="custom-table border">
+                <thead>
+                    <tr>
+                        {cols.map((col, index) => <th key={`col${index}`} className="text-start">{col}</th>)}
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {expData.map(exp => (
+                        <tr key={exp.id}>
+                            <td style={{ width: "10px" }}>
+                                <button className="btn btn-sm btn-danger" type="button" onClick={() => handleDelete(exp.id)}><i className="bi bi-trash3"></i></button>
+                            </td>
+                            <td style={{ width: "10px" }}>
+                                <button className="btn btn-sm btn-success" type="button" onClick={() => handleEdit(exp)}><i className="bi bi-pencil-square"></i></button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </>
+    )
+}
+
+
 function RealEstate() {
     const { modelData } = useDataContext();
     const [reName, setReName] = useState('')
@@ -287,7 +335,7 @@ function RealEstate() {
         <>
             <div>
                 <h1>{reName}</h1>
-                <div className="w-100 mt-5">
+                <div className="w-100 mt-3">
                     <div className="hstack w-100">
                         <div style={{ width: "40%", minHeight: "300px" }}>
                             <h4 className="text-start">DATOS</h4>
@@ -299,16 +347,16 @@ function RealEstate() {
                             </DataProvider>
                         </div>
                     </div>
-                    <div className="w-100 mt-3">
+                    <div className="w-100 mt-5">
                         <DataProvider modelName='alquiler' modelDepth='0' relatedModel='alquiler' relatedModelDepth='1' relatedFieldName='real_estate' modelId={reId}>
                             <Rent obj_id={reId} />
                         </DataProvider>
                     </div>
                     <div className="hstack w-100 mt-3">
                         <div style={{ width: "40%", minHeight: "300px" }}>
-                            {/*<DataProvider>
+                            <DataProvider modelName='gasto' modelDept='0' relatedModel='gasto' relatedModelDepth='1' relatedFieldName='real_estate' modelId={reId}>
                                 <Expenses obj_id={reId}/>
-                            </DataProvider>*/}
+                            </DataProvider>
                         </div>
                         <div className="ms-5" style={{ width: "60%", minHeight: "300px" }}>
                             {/*<DataProvider modelName='cobro' modelDepth='0' relatedModel='cobro' relatedModelDepth='1' relatedFieldName='real_estate' modelId={reId}>
