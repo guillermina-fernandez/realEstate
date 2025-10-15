@@ -2,10 +2,6 @@ import { useDataContext } from "../context/DataContext";
 
 function SearchBar() {
     const { objName, searchObj, handleSearch, openModal } = useDataContext();
-    //const obj_name = modelName.toUpperCase().replaceAll('_', ' ');
-    //const obj_name_title = String(modelName[0]).toUpperCase() + String(modelName).slice(1);
-    //const newModalTitle = `Agregar ${obj_name_title.replaceAll('_', ' ')}`
-    //const placeholder = `Buscar ${obj_name_title.replaceAll('_', ' ')}...`
     const obj_name_title = objName.toUpperCase();
     const placeholder = `Buscar ${objName}...`;
 

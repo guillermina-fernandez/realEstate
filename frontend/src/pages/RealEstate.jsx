@@ -12,9 +12,9 @@ function get_persons(personsString) {
 }
 
 
-function RsTable() {
+function ReTable() {
     const { modelData, setEditObj, showModal, openModal } = useDataContext();
-    const [rsType, setRsType] = useState(null)
+    const [reType, setReType] = useState(null)
     const [buyDate, setBuyDate] = useState(null)
     const [ownersStr, setOwnersStr] = useState('')
     const [usufructStr, setUsufructStr] = useState('')
@@ -23,12 +23,12 @@ function RsTable() {
 
     useEffect(() => {
         if (modelData) {
-            let rs_type = modelData.rs_type_name || '';
+            let re_type = modelData.re_type_name || '';
             const has_garage = modelData.has_garage;
             if (has_garage === 'SI') {
-                rs_type += ' CON COCHERA'
+                re_type += ' CON COCHERA'
             }
-            setRsType(rs_type);
+            setReType(re_type);
             let buy_date = modelData.buy_date || null
             buy_date = buy_date && spanishDate(buy_date)
             setBuyDate(buy_date)
@@ -51,7 +51,7 @@ function RsTable() {
                 <tbody>
                     <tr>
                         <th>Tipo:</th>
-                        <td>{rsType}</td>
+                        <td>{reType}</td>
                     </tr>
                     <tr>
                         <th>Dueños:</th>
@@ -96,7 +96,7 @@ function Taxes({obj_id}) {
         setEditObj(editObj)
     }
 
-    // Cannot use the <Table /> component since real_state and tax_type return objects, not strings...
+    // Cannot use the <Table /> component since real_estate and tax_type return objects, not strings...
     return (
         <>
             {showModal && <Modal obj_id={obj_id} />}
@@ -271,22 +271,22 @@ function Rent({obj_id}) {
 }
 
 
-function RealState() {
+function RealEstate() {
     const { modelData } = useDataContext();
-    const [rsName, setRsName] = useState('')
-    const [rsId, setRsId] = useState(null);
+    const [reName, setReName] = useState('')
+    const [reId, setReId] = useState(null);
 
     useEffect(() => {
         if (modelData) {
-            setRsName(modelData.rs_name);
-            setRsId(modelData.id);
+            setReName(modelData.re_name);
+            setReId(modelData.id);
         }
     }, [modelData])
     
     return (
         <>
             <div>
-                <h1>{rsName}</h1>
+                <h1>{reName}</h1>
                 <div className="w-100 mt-5">
                     <div className="hstack w-100">
                         <div style={{ width: "40%", minHeight: "300px" }}>
@@ -294,25 +294,25 @@ function RealState() {
                             <RsTable />
                         </div>
                         <div className="ms-5" style={{ width: "60%", minHeight: "300px" }}>
-                            <DataProvider modelName='impuesto' modelDepth='0' relatedModel='impuesto' relatedModelDepth='1' relatedFieldName='real_state' modelId={rsId}>
-                                <Taxes obj_id={rsId} />
+                            <DataProvider modelName='impuesto' modelDepth='0' relatedModel='impuesto' relatedModelDepth='1' relatedFieldName='real_estate' modelId={reId}>
+                                <Taxes obj_id={reId} />
                             </DataProvider>
                         </div>
                     </div>
                     <div className="w-100 mt-3">
-                        <DataProvider modelName='alquiler' modelDepth='0' relatedModel='alquiler' relatedModelDepth='1' relatedFieldName='real_state' modelId={rsId}>
-                            <Rent obj_id={rsId} />
+                        <DataProvider modelName='alquiler' modelDepth='0' relatedModel='alquiler' relatedModelDepth='1' relatedFieldName='real_estate' modelId={reId}>
+                            <Rent obj_id={reId} />
                         </DataProvider>
                     </div>
                     <div className="hstack w-100 mt-3">
                         <div style={{ width: "40%", minHeight: "300px" }}>
                             {/*<DataProvider>
-                                <Expenses obj_id={rsId}/>
+                                <Expenses obj_id={reId}/>
                             </DataProvider>*/}
                         </div>
                         <div className="ms-5" style={{ width: "60%", minHeight: "300px" }}>
-                            {/*<DataProvider modelName='cobro' modelDepth='0' relatedModel='cobro' relatedModelDepth='1' relatedFieldName='real_state' modelId={rsId}>
-                                <Collects obj_id={rsId} />
+                            {/*<DataProvider modelName='cobro' modelDepth='0' relatedModel='cobro' relatedModelDepth='1' relatedFieldName='real_estate' modelId={reId}>
+                                <Collects obj_id={reId} />
                             </DataProvider>*/}
                         </div>
                     </div>
@@ -322,4 +322,4 @@ function RealState() {
     )
 }
 
-export default RealState;
+export default RealEstate;

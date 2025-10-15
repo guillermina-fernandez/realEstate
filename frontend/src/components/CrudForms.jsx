@@ -30,25 +30,25 @@ function FormOwner({ formRef, initialData }) {
 }
 
 
-function FormRsType({ formRef, initialData }) {
+function FormReType({ formRef, initialData }) {
     const { register, onSubmit } = useFormHandler(initialData);
 
     return (
         <form ref={formRef} onSubmit={onSubmit}>
             <div className="w-100">
-                <label htmlFor='rs_type'>TIPO DE PROPIEDAD</label>
-                <input className="form-control form-control-sm" id="rs_type" name="rs_type" {...register('rs_type')} required/>
+                <label htmlFor='re_type'>TIPO DE PROPIEDAD</label>
+                <input className="form-control form-control-sm" id="re_type" name="re_type" {...register('re_type')} required/>
             </div>
         </form>
     )
 }
 
 
-function FormRealState({ formRef, initialData}) {
+function FormRealEstate({ formRef, initialData}) {
     const { register, onSubmit, setValue } = useFormHandler(initialData);
     const { setError, setLoading } = useDataContext();
     
-    const [rsTypes, setRsTypes] = useState(null);
+    const [reTypes, setReTypes] = useState(null);
     const [ownersData, setOwnersData] = useState(null);
     const [selectedOwners, setSelectedOwners] = useState([]);
     const [selectedUsufructs, setSelectedUsufructs] = useState([]);
@@ -65,7 +65,7 @@ function FormRealState({ formRef, initialData}) {
             try {
                 const fetchedData = await fetchModelObjectsAPI('tipo_de_propiedad', "0");
                 const flatData = Array.isArray(fetchedData) ? fetchedData.flat() : [];
-                setRsTypes(flatData)
+                setReTypes(flatData)
             } catch (err) {
                 setError(err);
                 console.error(err);
@@ -104,11 +104,11 @@ function FormRealState({ formRef, initialData}) {
     return (
         <form ref={formRef} onSubmit={(onSubmit)}>
             <div className='w-100'>
-                <label htmlFor="rs_type">TIPO</label>
-                <select className="form-select form-select-sm" id="rs_type" name="rs_type" {...register('rs_type')} defaultValue="" required>
+                <label htmlFor="re_type">TIPO</label>
+                <select className="form-select form-select-sm" id="re_type" name="re_type" {...register('re_type')} defaultValue="" required>
                     <option key="0" value="" disabled></option>
-                    {rsTypes && rsTypes.map((opt) => (
-                        <option key={opt.id} value={opt.id}>{opt.rs_type}</option>
+                    {reTypes && reTypes.map((opt) => (
+                        <option key={opt.id} value={opt.id}>{opt.re_type}</option>
                     ))}
                 </select>
             </div>
@@ -210,8 +210,8 @@ function FormTax({ obj_id, formRef, initialData }) {
     return (
         <form ref={formRef} onSubmit={onSubmit}>
             <div>
-                {!initialData?.real_state &&
-                    <input type="number" id="real_state" name="real_state" value={parseInt(obj_id)} {...register('real_state')} hidden readOnly/>
+                {!initialData?.real_estate &&
+                    <input type="number" id="real_estate" name="real_estate" value={parseInt(obj_id)} {...register('real_estate')} hidden readOnly/>
                 }
             </div>
             <div className="w-100">
@@ -306,8 +306,8 @@ function FormRent({ obj_id, formRef, initialData }) {
     return (
         <form ref={formRef} onSubmit={onSubmit}>
             <div>
-                {!initialData?.real_state &&
-                    <input type="number" id="real_state" name="real_state" value={parseInt(obj_id)} {...register('real_state')} hidden readOnly/>
+                {!initialData?.real_estate &&
+                    <input type="number" id="real_estate" name="real_estate" value={parseInt(obj_id)} {...register('real_estate')} hidden readOnly/>
                 }
             </div>
             <div className='hstack w-100'>
@@ -374,4 +374,4 @@ function FormRentStep({ obj_id, formRef, initialData }) {
 }
 
 
-export { FormOwner, FormRsType, FormRealState, FormTax, FormTaxType, FormRent, FormRentStep};
+export { FormOwner, FormReType, FormRealEstate, FormTax, FormTaxType, FormRent, FormRentStep};

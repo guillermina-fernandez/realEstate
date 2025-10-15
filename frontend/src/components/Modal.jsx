@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDataContext } from '../context/DataContext';
-import {FormOwner, FormRealState, FormRsType, FormTax, FormTaxType, FormRent, FormRentStep} from './CrudForms';
+import {FormOwner, FormRealEstate, FormReType, FormTax, FormTaxType, FormRent, FormRentStep} from './CrudForms';
 
 
 function Modal(props) {
@@ -31,9 +31,9 @@ function Modal(props) {
                     <div className="modal-body">
                         {modelName === 'propietario' && <FormOwner formRef={formRef} initialData={editObj}></FormOwner>}
                         {modelName === 'inquilino' && <FormOwner formRef={formRef} initialData={editObj}></FormOwner>}
-                        {modelName === "tipo_de_propiedad" && <FormRsType formRef={formRef} initialData={editObj}></FormRsType>}
+                        {modelName === "tipo_de_propiedad" && <FormReType formRef={formRef} initialData={editObj}></FormReType>}
                         {modelName === 'tipo_de_impuesto' && <FormTaxType formRef={formRef} initialData={editObj}></FormTaxType>}
-                        {modelName === 'propiedad' && <FormRealState formRef={formRef} initialData={editObj}></FormRealState>}
+                        {modelName === 'propiedad' && <FormRealEstate formRef={formRef} initialData={editObj}></FormRealEstate>}
                         {modelName === "impuesto" && <FormTax formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormTax>}
                         {modelName === 'alquiler' && <FormRent formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormRent>}
                         {modelName === 'escalon' && <FormRentStep formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormRentStep>}

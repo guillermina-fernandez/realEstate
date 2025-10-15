@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Crud from './pages/Crud'
 import { DataProvider } from './context/DataContext'
-import RealState from './pages/RealState'
+import RealEstate from './pages/RealEstate'
 import NavBar from './components/NavBar'
 
 
@@ -30,7 +30,7 @@ function App() {
         ))}
         <Route path="/propiedad/:obj_id" element={
           <DataProvider modelName='propiedad' modelDepth='0' modelId={null} relatedModel={null} relatedModelDepth={null} relatedFieldName={null}>
-              <RealState />
+              <RealEstate />
           </DataProvider>
         } />
       </Routes>

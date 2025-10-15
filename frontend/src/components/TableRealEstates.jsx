@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDataContext } from "../context/DataContext";
 
-function TableRealStates() {
+function TableRealEstates() {
     const { modelData, foundObjs } = useDataContext();
     const [showData, setShowData] = useState([])
 
@@ -34,8 +34,8 @@ function TableRealStates() {
                     {showData.map((dataItem) =>
                         <tr key={dataItem.id} className="text-start">
                             <td>{dataItem.id}</td>
-                            <td>{dataItem.rs_name}</td>
-                            <td>{dataItem.rs_type_name}</td>
+                            <td>{dataItem.re_name}</td>
+                            <td>{dataItem.re_type_name}</td>
                             <td>{dataItem.has_garage}</td>
                             <td>{dataItem.owners}</td>
                             <td>{dataItem.usufructs}</td>
@@ -51,4 +51,4 @@ function TableRealStates() {
     )
 }
 
-export default TableRealStates;
+export default TableRealEstates;

@@ -15,13 +15,13 @@ const modelConfig = {
     },
     tipo_de_propiedad: {
         columns: ["COD", "TIPO DE PROPIEDAD"],
-        searchBy: ["rs_type"],
-        sortBy: ["rs_type"],
+        searchBy: ["re_type"],
+        sortBy: ["re_type"],
     },
     propiedad: {
         columns: ["COD", "PROPIEDAD", "TIPO", "COCHERA", "PROPIETARIO/S", "USUFRUCTO", "OBS"],
-        searchBy: ["rs_name", "owners", "usufructs"],
-        sortBy: ["rs_name"],
+        searchBy: ["re_name", "owners", "usufructs"],
+        sortBy: ["re_name"],
     },
     tipo_de_impuesto: {
         columns: ["COD", 'TIPO DE IMPUESTO'],
@@ -262,7 +262,6 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
         modelName,
         modelData,
         modelConfig,
-        // updateObjData,
         setLoading,
         setError,
         showModal, 
