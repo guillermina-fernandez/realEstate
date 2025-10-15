@@ -291,7 +291,7 @@ function RealEstate() {
                     <div className="hstack w-100">
                         <div style={{ width: "40%", minHeight: "300px" }}>
                             <h4 className="text-start">DATOS</h4>
-                            <RsTable />
+                            <ReTable />
                         </div>
                         <div className="ms-5" style={{ width: "60%", minHeight: "300px" }}>
                             <DataProvider modelName='impuesto' modelDepth='0' relatedModel='impuesto' relatedModelDepth='1' relatedFieldName='real_estate' modelId={reId}>
