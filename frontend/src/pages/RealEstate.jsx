@@ -39,7 +39,7 @@ function ReTable() {
             setUsufructStr(usufructs)
         }
     }, [modelData])
-    
+
     const handleEdit = (editObj) => {
         openModal('edit');
         setEditObj(editObj)
@@ -82,7 +82,7 @@ function ReTable() {
 }
 
 
-function Taxes({obj_id}) {
+function Taxes({ obj_id }) {
     const { modelName, modelData, openModal, showModal, handleDelete, setEditObj, modelConfig } = useDataContext();
     const [taxData, setTaxData] = useState([])
 
@@ -137,7 +137,7 @@ function Taxes({obj_id}) {
 
 
 function RentSteps({ obj_id }) {
-    const { modelData, openModal, showModal, setEditObj, modelConfig, modelName} = useDataContext();
+    const { modelData, openModal, showModal, setEditObj, modelConfig, modelName } = useDataContext();
     const [stepData, setStepData] = useState([])
 
     useEffect(() => {
@@ -188,7 +188,7 @@ function RentSteps({ obj_id }) {
 }
 
 
-function Rent({obj_id}) {
+function Rent({ obj_id }) {
     const { modelData, openModal, showModal, setEditObj } = useDataContext();
     const [lastRent, setLastRent] = useState(null);
     const [tenants, setTenants] = useState([]);
@@ -260,7 +260,7 @@ function Rent({obj_id}) {
                     </div>
                 }
             </div>
-            {lastRent && 
+            {lastRent &&
                 <div className="ms-5" style={{ width: "60%", minHeight: "300px" }}>
                     <DataProvider modelName='escalon' modelDepth='0' relatedModel='escalon' relatedModelDepth='0' relatedFieldName='rent' modelId={lastRent.id}>
                         <RentSteps obj_id={lastRent.id} />
@@ -283,7 +283,7 @@ function RealEstate() {
             setReId(modelData.id);
         }
     }, [modelData])
-    
+
     return (
         <>
             <div>
@@ -306,17 +306,31 @@ function RealEstate() {
                         </DataProvider>
                     </div>
                     <div className="hstack w-100 mt-3">
-                        <div style={{ width: "40%", minHeight: "300px" }}>
+                        <div style={{
+                            width: "50%",
+                            minHeight: "300px",
+                            overflowX: "auto",           // Horizontal scroll when needed
+                            overflowY: "auto",           // Vertical scroll when needed
+                            maxWidth: "50%"              // Enforce max width
+                        }}>
                             {reId &&
                                 <BalanceProvider reId={reId}>
                                     <Expenses />
                                 </BalanceProvider>
                             }
                         </div>
-                        <div className="ms-5" style={{ width: "60%", minHeight: "300px" }}>
-                            {/*<DataProvider modelName='cobro' modelDepth='0' relatedModel='cobro' relatedModelDepth='1' relatedFieldName='real_estate' modelId={reId}>
-                                <Collects obj_id={reId} />
-                            </DataProvider>*/}
+                        <div className="ms-5" style={{
+                            width: "50%",
+                            minHeight: "300px",
+                            overflowX: "auto",
+                            overflowY: "auto",
+                            maxWidth: "50%"
+                        }}>
+                            {reId &&
+                                <BalanceProvider reId={reId}>
+                                    <Expenses />
+                                </BalanceProvider>
+                            }
                         </div>
                     </div>
                 </div>

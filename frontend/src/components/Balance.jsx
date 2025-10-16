@@ -22,7 +22,7 @@ function Expenses() {
         <>
             {/*showModal && <Modal obj_id={obj_id} />*/}
             <div className="hstack">
-                <h4>IMPUESTOS</h4>
+                <h4>GASTOS</h4>
                 <button type="button" className="btn btn-primary btn-sm mb-2 ms-3">+</button>
             </div>
             <table className="custom-table border">
@@ -48,8 +48,12 @@ function Expenses() {
                                         <td>{exp.expense_type}</td>
                                         <td>{getExpenseLabel(exp)}</td>
                                         <td>{exp.observations}</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td style={{ width: "10px" }}>
+                                            <button className="btn btn-sm btn-danger" type="button"><i className="bi bi-trash3"></i></button>
+                                        </td>
+                                        <td style={{ width: "10px" }}>
+                                            <button className="btn btn-sm btn-success" type="button"><i className="bi bi-pencil-square"></i></button>
+                                        </td>
                                     </tr>
                                 ))}
                                 <tr className="fw-bold" style={{backgroundColor: "#75ACFF"}}>
