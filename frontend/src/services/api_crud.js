@@ -129,3 +129,22 @@ export const deleteObjAPI = async (modelName, objId) => {
         throw new Error(message);
     }
 };
+
+
+// Fetch all objects from expenses or collects
+export const fetchBalanceDataAPI = async (reId) => {
+    const response = await fetch(`http://127.0.0.1:8000/api/propiedad/${reId}/balance/`);
+
+    if (!response.ok) {
+        let message = `Error ${response.status}`;
+        try {
+            const result = await response.json();
+            message = result.error || JSON.stringify(result);
+        } catch {
+            
+        }
+        throw new Error(message);
+    }
+    
+    return await response.json();
+};

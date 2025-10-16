@@ -2,6 +2,8 @@ import re
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+from collections import defaultdict
+from datetime import date
 
 
 def validate_cuit(value):
@@ -150,3 +152,41 @@ def normalize_form_data(model_obj, form_data):
 
     return normalized
 
+
+def format_balance_data(model, re_id, serializer_class, date_field, value_field, nested_fields_to_remove=None):
+    items = model.objects.filter(real_estate__id=int(re_id))
+    serializer = serializer_class(items, many=True)
+    data_list = serializer.data
+
+    for d in data_list:
+        d.pop('real_estate', None)
+        if nested_fields_to_remove:
+            for nested in nested_fields_to_remove:
+                if nested in d and isinstance(d[nested], dict):
+                    d[nested].pop('real_estate', None)
+
+    grouped = defaultdict(lambda: {'items': [], 'total': 0})
+    for d in data_list:
+        dt = d.get(date_field)
+        if not dt:
+            continue
+        month_date = date.fromisoformat(dt).replace(day=1)
+        month_str = month_date.strftime("%m/%Y")
+        value = float(d.get(value_field, 0))
+        grouped[month_str]['items'].append(d)
+        grouped[month_str]['total'] += value
+
+    monthly_data = sorted(grouped.items(), key=lambda x: x[0], reverse=True)
+    grand_total = sum(m['total'] for _, m in monthly_data)
+
+    return {
+        "grand_total": round(grand_total, 2),
+        "monthly_data": [
+            {
+                "month": month,
+                "total": round(m['total'], 2),
+                model.__name__.lower() + "s": m['items']
+            }
+            for month, m in monthly_data
+        ]
+    }

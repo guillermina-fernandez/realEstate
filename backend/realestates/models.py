@@ -142,3 +142,24 @@ class Expense(models.Model):
 
     class Meta:
         ordering = ('-pay_date', )
+
+
+class Collect(models.Model):
+    real_estate = models.ForeignKey(RealEstate, related_name='collect_re', on_delete=models.CASCADE)
+    col_date = models.DateField()
+    col_value = models.FloatField()
+    col_type = models.CharField(max_length=10)
+    col_other = models.CharField(max_length=200, blank=True, null=True)
+    observations = models.CharField(max_length=500, blank=True, null=True)
+
+    def clean(self):
+        if self.col_type == 'OTRO' and not self.col_other:
+            raise ValidationError('Ingrese un detalle de cobro')
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ('-col_date', )
+

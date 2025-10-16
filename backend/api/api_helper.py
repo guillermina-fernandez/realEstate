@@ -6,12 +6,12 @@ from django.core.exceptions import ValidationError
 from django.db import transaction, IntegrityError
 from django.db.models import ProtectedError, RestrictedError
 
-from common.validators import normalize_form_data
+from common.validators import normalize_form_data, format_balance_data
 
 from api.serializers import get_serializer_class, RealEstateCustomSerializer
 
 from parameters.models import Owner, Tenant, RealEstateType, TaxType
-from realestates.models import RealEstate, Tax, Rent, RentStep, Expense
+from realestates.models import RealEstate, Tax, Rent, RentStep, Expense, Collect
 
 models_dic = {
     'propietario': Owner,
@@ -22,7 +22,6 @@ models_dic = {
     'impuesto': Tax,
     'alquiler': Rent,
     'escalon': RentStep,
-    'gasto': Expense,
 }
 
 
@@ -148,7 +147,6 @@ def update_object(request, model_name, obj_id, depth):
         return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @api_view(['DELETE'])
 def delete_object(request, model_name, obj_id):
     if not model_name:
@@ -174,3 +172,33 @@ def delete_object(request, model_name, obj_id):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['GET'])
+def fetch_balance(request, re_id):
+    expenses_data = format_balance_data(
+        model=Expense,
+        re_id=re_id,
+        serializer_class=get_serializer_class(Expense, '__all__', 2),
+        date_field='pay_date',
+        value_field='pay_value',
+        nested_fields_to_remove=['tax']
+    )
+
+    collects_data = format_balance_data(
+        model=Collect,
+        re_id=re_id,
+        serializer_class=get_serializer_class(Collect, '__all__', 2),
+        date_field='collect_date',
+        value_field='collect_value',
+        nested_fields_to_remove=['rent']
+    )
+
+    result = {
+        "expenses": expenses_data,
+        "collects": collects_data,
+        "balance": collects_data["grand_total"] - expenses_data["grand_total"]
+    }
+
+    print(result)
+
+    return Response(result, status=status.HTTP_200_OK)
