@@ -220,7 +220,7 @@ function Rent({ obj_id }) {
 
     return (
         <div className="hstack w-100">
-            <div style={{ width: "40%", minHeight: "300px" }}>
+            <div style={{ width: "40%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "40%" }}>
                 {showModal && <Modal obj_id={obj_id} />}
                 <div className="hstack">
                     <h4>ALQUILER</h4>
@@ -228,7 +228,7 @@ function Rent({ obj_id }) {
                 </div>
                 {lastRent &&
                     <div>
-                        <table className="custom-table border">
+                        <table className="custom-fix-table border">
                             <tbody>
                                 <tr>
                                     <th>Fecha Inicio</th>
@@ -261,7 +261,7 @@ function Rent({ obj_id }) {
                 }
             </div>
             {lastRent &&
-                <div className="ms-5" style={{ width: "60%", minHeight: "300px" }}>
+                <div className='ms-5' style={{ width: "60%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "60%" }}>
                     <DataProvider modelName='escalon' modelDepth='0' relatedModel='escalon' relatedModelDepth='0' relatedFieldName='rent' modelId={lastRent.id}>
                         <RentSteps obj_id={lastRent.id} />
                     </DataProvider>
@@ -290,33 +290,33 @@ function RealEstate() {
                 <h1>{reName}</h1>
                 <div className="w-100 mt-3">
                     <div className="hstack w-100">
-                        <div style={{ width: "40%", minHeight: "300px" }}>
+                        <div style={{ width: "40%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "40%" }}>
                             <h4 className="text-start">DATOS</h4>
                             <ReTable />
                         </div>
-                        <div className="ms-5" style={{ width: "60%", minHeight: "300px" }}>
+                        <div className='ms-5' style={{ width: "60%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "60%" }}>
                             <DataProvider modelName='impuesto' modelDepth='0' relatedModel='impuesto' relatedModelDepth='1' relatedFieldName='real_estate' modelId={reId}>
                                 <Taxes obj_id={reId} />
                             </DataProvider>
                         </div>
                     </div>
-                    <div className="w-100 mt-5">
+                    <div className="w-100 mt-3">
                         <DataProvider modelName='alquiler' modelDepth='0' relatedModel='alquiler' relatedModelDepth='1' relatedFieldName='real_estate' modelId={reId}>
                             <Rent obj_id={reId} />
                         </DataProvider>
                     </div>
                     <div className="hstack w-100 mt-3" style={{ alignItems: "flex-start" }}>
-                        <div className='border' style={{ width: "50%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "50%" }}>
+                        <div style={{ width: "40%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "40%" }}>
                             {reId &&
                                 <BalanceProvider reId={reId} modelName='gasto'>
-                                    <Expenses />
+                                    <Collects />
                                 </BalanceProvider>
                             }
                         </div>
-                        <div className="border ms-5" style={{ width: "50%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "50%" }}>
+                        <div className="ms-5" style={{ width: "60%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "60%" }}>
                             {reId &&
                                 <BalanceProvider reId={reId} modelName='cobro'>
-                                    <Collects />
+                                    <Expenses />
                                 </BalanceProvider>
                             }
                         </div>

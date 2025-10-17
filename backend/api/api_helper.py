@@ -200,5 +200,4 @@ def fetch_balance(request, re_id):
         "balance": collects_data["grand_total"] - expenses_data["grand_total"]
     }
 
-    print(result)
     return Response(result, status=status.HTTP_200_OK)

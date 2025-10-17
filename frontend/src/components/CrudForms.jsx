@@ -469,53 +469,95 @@ function FormExpense({ obj_id, formRef, initialData }) {
 
 
 function FormCollect({ obj_id, formRef, initialData }) {
-    const [hide, setHide] = useState(true)
-    const { register, onSubmit } = useBalanceFormHandler('cobro', initialData);
+    const [hide, setHide] = useState(true);
+    const [steps, setSteps] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [colType, setColType] = useState(initialData?.col_type || 'ALQUILER');
+
+    const { register, onSubmit, setValue } = useBalanceFormHandler('cobro', initialData);
 
     useEffect(() => {
-        initialData && handleChange(initialData.col_type)
-    }, []);
+        if (initialData) handleChange(initialData.col_type);
+    }, [initialData]);
+
+    useEffect(() => {
+        const loadRent = async () => {
+            try {
+                const fetchedRent = await fetchRelatedModelObjectsAPI('alquiler', '0', 'real_estate', obj_id);
+                const lastRent = fetchedRent?.length ? fetchedRent[0] : null;
+
+                const fetchedSteps = lastRent
+                    ? await fetchRelatedModelObjectsAPI('escalon', '0', 'rent', lastRent.id)
+                    : [];
+
+                setSteps(fetchedSteps || []);
+            } catch (err) {
+                setError(err);
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadRent();
+    }, [obj_id]);
 
     const handleChange = (optValue) => {
-        optValue == 'OTRO' ? setHide(false) : setHide(true);
-    }
+        setColType(optValue);
+        setHide(optValue !== 'OTRO');
+    };
+
+    const handleDateBlur = (e) => {
+        const selectedDate = e.target.value;
+
+        if (colType !== 'ALQUILER' || !selectedDate || !steps.length) {
+            setValue('col_value', 0);
+            return;
+        }
+
+        const match = steps.find(
+            (step) => selectedDate >= step.date_from && selectedDate <= step.date_to
+        );
+
+        const rentValue = match?.rent_value ?? 0;
+        setValue('col_value', rentValue);
+    };
 
     return (
         <>
             <form ref={formRef} onSubmit={onSubmit}>
-                <div>
-                    {!initialData?.real_estate &&
-                        <input type="number" id="real_estate" name="real_estate" value={parseInt(obj_id)} {...register('real_estate')} hidden readOnly />
-                    }
-                </div>
-                <div className='hstack w-100'>
-                    <div className="w-100">
-                        <label htmlFor='col_date'>FECHA</label>
-                        <input className='form-control form-control-sm' type='date' id='col_date' name='col_date' defaultValue={new Date().toISOString().split('T')[0]} {...register('col_date')} required autoFocus />
-                    </div>
-                    <div className="w-100 ms-2">
-                        <label htmlFor='col_value'>IMPORTE</label>
-                        <input className='form-control form-control-sm' type='number' step='0.01' min='0' id='col_value' name='col_value' {...register('col_value')} required />
-                    </div>
-                </div>
-                <div className='w-100 mt-3'>
-                    <label htmlFor='expense_type'>TIPO DE COBRO</label>
-                    <select className='form-select form-select-sm' id='col_type' name='col_type' {...register('col_type', { onChange: (e) => handleChange(e.target.value) })} required>
+                {!initialData?.real_estate && (
+                    <input type="number" id="real_estate" name="real_estate" value={parseInt(obj_id)} {...register('real_estate')} hidden readOnly />
+                )}
+                <div className="w-100">
+                    <label htmlFor="col_type">TIPO DE COBRO</label>
+                    <select className="form-select form-select-sm" id="col_type" name="col_type" {...register('col_type', { onChange: (e) => handleChange(e.target.value), })} defaultValue={colType} required autoFocus >
                         <option>ALQUILER</option>
                         <option>OTRO</option>
                     </select>
                 </div>
                 <div className="w-100 mt-3" hidden={hide}>
-                    <label htmlFor='other_expense'>DETALLE</label>
+                    <label htmlFor="col_other">DETALLE</label>
                     <input className="form-control form-control-sm" id="col_other" name="col_other" {...register('col_other')} required={!hide} />
                 </div>
-                <div className='w-100 mt-3'>
-                    <label htmlFor='observations'>OBSERVACIONES</label>
-                    <input className='form-control form-control-sm' id='observations' name='observations' {...register('observations')} />
+                <div className="hstack w-100 mt-3">
+                    <div className="w-100">
+                        <label htmlFor="col_date">FECHA</label>
+                        <input className="form-control form-control-sm" type="date" id="col_date" name="col_date" defaultValue={new Date().toISOString().split('T')[0]} {...register('col_date', { onBlur: handleDateBlur })} required />
+                    </div>
+                    <div className="w-100 ms-2">
+                        <label htmlFor="col_value">IMPORTE</label>
+                        <input className="form-control form-control-sm" type="number" step="0.01" min="0" id="col_value" name="col_value" {...register('col_value')} required />
+                    </div>
+                </div>
+                <div className="w-100 mt-3">
+                    <label htmlFor="observations">OBSERVACIONES</label>
+                    <input className="form-control form-control-sm" id="observations" name="observations" {...register('observations')} />
                 </div>
             </form>
         </>
-    )
+    );
 }
 
 

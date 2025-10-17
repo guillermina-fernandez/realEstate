@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useBalanceContext } from "../context/BalanceContext";
 import { spanishDate } from "../myScripts/myMainScript";
 import { useRef } from "react";
@@ -7,7 +7,7 @@ import { FormExpense, FormCollect } from "./CrudForms";
 
 function ModalBalance(props) {
     const { closeModal, editObj, modalTitle } = useBalanceContext();
-    
+
     const formRef = useRef(null);
 
     function handleClick() {
@@ -15,7 +15,7 @@ function ModalBalance(props) {
             formRef.current.requestSubmit();
         }
     }
-    
+
     return (
         <div className="modal fade show d-block pg-show-modal" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
             <div className="modal-dialog" role="document">
@@ -27,12 +27,12 @@ function ModalBalance(props) {
                     <div className="modal-body">
                         {props.modelName === 'gasto' ?
                             <FormExpense formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormExpense> :
-                            <FormCollect formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormCollect> }
+                            <FormCollect formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormCollect>}
                     </div>
-                    <hr/>
+                    <hr />
                     <div className="hstack w-100 justify-content-between">
                         <div>
-                            
+
                         </div>
                         <div className="hstack gap-3">
                             <button className="btn btn-default" type="button" onClick={closeModal}>Cancelar</button>
@@ -61,7 +61,7 @@ function getExpenseLabel(exp) {
 
 function Expenses() {
     const { reId, expenses, totalExpenses, openModal, showModal, setEditObj, handleDelete } = useBalanceContext();
-    
+
     const handleEdit = (editObj) => {
         openModal('gasto', 'edit');
         setEditObj(editObj)
@@ -77,11 +77,11 @@ function Expenses() {
             <table className="custom-table border">
                 <thead>
                     <tr>
-                        <th>FECHA</th>
-                        <th>IMPORTE</th>
-                        <th>TIPO</th>
-                        <th>DETALLE</th>
-                        <th>OBS</th>
+                        <th style={{ width: "1%", whiteSpace: "nowrap" }}>FECHA</th>
+                        <th style={{ width: "1%", whiteSpace: "nowrap" }}>IMPORTE</th>
+                        <th className="text-center">TIPO</th>
+                        <th className="text-center">DETALLE</th>
+                        <th className="text-center">OBS</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -92,20 +92,20 @@ function Expenses() {
                             <React.Fragment key={monthData.month}>
                                 {monthData.expenses.map((exp) => (
                                     <tr key={exp.id}>
-                                        <td>{spanishDate(exp.pay_date)}</td>
-                                        <td className="text-end">{parseFloat(exp.pay_value).toFixed(2)}</td>
-                                        <td>{exp.expense_type}</td>
-                                        <td>{getExpenseLabel(exp)}</td>
-                                        <td>{exp.observations}</td>
+                                        <td style={{ width: "1%", whiteSpace: "nowrap" }}>{spanishDate(exp.pay_date)}</td>
+                                        <td className="text-end" style={{ width: "1%", whiteSpace: "nowrap" }}>{parseFloat(exp.pay_value).toFixed(2)}</td>
+                                        <td className="text-center">{exp.expense_type}</td>
+                                        <td className="text-center">{getExpenseLabel(exp)}</td>
+                                        <td className="text-center">{exp.observations}</td>
                                         <td style={{ width: "10px" }}>
-                                            <button className="btn btn-sm btn-danger" type="button"onClick={() => handleDelete('gasto', exp.id)}><i className="bi bi-trash3"></i></button>
+                                            <button className="btn btn-sm btn-danger" type="button" onClick={() => handleDelete('gasto', exp.id)}><i className="bi bi-trash3"></i></button>
                                         </td>
                                         <td style={{ width: "10px" }}>
                                             <button className="btn btn-sm btn-success" type="button" onClick={() => handleEdit(exp)}><i className="bi bi-pencil-square"></i></button>
                                         </td>
                                     </tr>
                                 ))}
-                                <tr className="fw-bold" style={{backgroundColor: "#75ACFF"}}>
+                                <tr className="fw-bold" style={{ backgroundColor: "#E6F07A" }}>
                                     <td>Total {monthData.month}:</td>
                                     <td className="text-end">{parseFloat(monthData.total).toFixed(2)}</td>
                                     <td colSpan={5}></td>
@@ -119,7 +119,7 @@ function Expenses() {
                         <tr>
                             <td colSpan={3} style={{ height: "10px", border: "none" }}></td>
                         </tr>
-                        <tr className="fw-bold" style={{backgroundColor: "#2E82FF"}}>
+                        <tr className="fw-bold" style={{ backgroundColor: "#F0FF6E" }}>
                             <td>TOTAL HISTORICO</td>
                             <td className="text-end">{parseFloat(totalExpenses).toFixed(2)}</td>
                             <td colSpan={5}></td>
@@ -133,13 +133,18 @@ function Expenses() {
 
 
 function Collects() {
-    const { reId, collects, totalCollects, openModal, showModal, setEditObj, handleDelete } = useBalanceContext();
-    
+    const { reId, setLoading, setError, collects, totalCollects, openModal, showModal, setEditObj, handleDelete, grandTotal } = useBalanceContext();
+    const [totalColor, setTotalColor] = useState('#8fbafaff')
+
+    useEffect(() => {
+        grandTotal && grandTotal < 0 ? setTotalColor('#FFBA8F') : setTotalColor('#8fbafaff');
+    }, [grandTotal])
+
     const handleEdit = (editObj) => {
         openModal('cobro', 'edit');
         setEditObj(editObj)
     }
-    
+
     return (
         <>
             {showModal && reId && (<ModalBalance modelName='cobro' obj_id={reId} />)}
@@ -150,11 +155,11 @@ function Collects() {
             <table className="custom-table border">
                 <thead>
                     <tr>
-                        <th>FECHA</th>
-                        <th>IMPORTE</th>
-                        <th>TIPO</th>
-                        <th>DETALLE</th>
-                        <th>OBS</th>
+                        <th style={{ width: "1%", whiteSpace: "nowrap" }}>FECHA</th>
+                        <th style={{ width: "1%", whiteSpace: "nowrap" }}>IMPORTE</th>
+                        <th className="text-center">TIPO</th>
+                        <th className="text-center">DETALLE</th>
+                        <th className="text-center">OBS</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -165,20 +170,20 @@ function Collects() {
                             <React.Fragment key={monthData.month}>
                                 {monthData.collects.map((col) => (
                                     <tr key={col.id}>
-                                        <td>{spanishDate(col.col_date)}</td>
-                                        <td className="text-end">{parseFloat(col.col_value).toFixed(2)}</td>
-                                        <td>{col.col_type}</td>
-                                        <td>{col.col_type == 'OTRO' && col.col_other}</td>
-                                        <td>{col.observations}</td>
+                                        <td style={{ width: "1%", whiteSpace: "nowrap" }}>{spanishDate(col.col_date)}</td>
+                                        <td className="text-end" style={{ width: "1%", whiteSpace: "nowrap" }}>{parseFloat(col.col_value).toFixed(2)}</td>
+                                        <td className="text-center">{col.col_type}</td>
+                                        <td className="text-center">{col.col_type == 'OTRO' && col.col_other}</td>
+                                        <td className="text-center">{col.observations}</td>
                                         <td style={{ width: "10px" }}>
-                                            <button className="btn btn-sm btn-danger" type="button"onClick={() => handleDelete('cobro', col.id)}><i className="bi bi-trash3"></i></button>
+                                            <button className="btn btn-sm btn-danger" type="button" onClick={() => handleDelete('cobro', col.id)}><i className="bi bi-trash3"></i></button>
                                         </td>
                                         <td style={{ width: "10px" }}>
                                             <button className="btn btn-sm btn-success" type="button" onClick={() => handleEdit(col)}><i className="bi bi-pencil-square"></i></button>
                                         </td>
                                     </tr>
                                 ))}
-                                <tr className="fw-bold" style={{backgroundColor: "#75ACFF"}}>
+                                <tr className="fw-bold" style={{ backgroundColor: "#E6F07A" }}>
                                     <td>Total {monthData.month}:</td>
                                     <td className="text-end">{parseFloat(monthData.total).toFixed(2)}</td>
                                     <td colSpan={5}></td>
@@ -192,14 +197,21 @@ function Collects() {
                         <tr>
                             <td colSpan={3} style={{ height: "10px", border: "none" }}></td>
                         </tr>
-                        <tr className="fw-bold" style={{backgroundColor: "#2E82FF"}}>
+                        <tr className="fw-bold" style={{ backgroundColor: "#F0FF6E" }}>
                             <td>TOTAL HISTORICO</td>
                             <td className="text-end">{parseFloat(totalCollects).toFixed(2)}</td>
                             <td colSpan={5}></td>
                         </tr>
+                        <tr>
+                            <td colSpan={3} style={{ height: "20px", border: "none" }}></td>
+                        </tr>
+                        <tr className="fw-bold" style={{ backgroundColor: totalColor }}>
+                            <td colSpan={7} className="text-center">BALANCE HISTORICO (COBROS - GASTOS): {parseFloat(grandTotal).toFixed(2)}</td>
+                        </tr>
                     </tfoot>
                 )}
             </table>
+
         </>
     );
 }

@@ -75,8 +75,8 @@ export const BalanceProvider = ({ reId, children }) => {
     const handleDelete = async (modelName, deleteId) => {
         const objToDelete = modelName === 'gasto'
             ? expenses.flatMap(m => m.expenses).find(e => e.id === deleteId)
-            : collects.flatMap(m => m.expenses).find(e => e.id === deleteId);
-
+            : collects.flatMap(m => m.collects).find(e => e.id === deleteId);
+        
         if (!objToDelete) return;
 
         let message = 'ATENCIÓN!\nSe eliminará el siguiente registro y todas sus dependencias:\n';
@@ -119,6 +119,8 @@ export const BalanceProvider = ({ reId, children }) => {
     // Context values passed to children
     const value = {
         reId,
+        setLoading,
+        setError,
         grandTotal,
         expenses,
         totalExpenses,
