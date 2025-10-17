@@ -1,6 +1,50 @@
 import React from "react";
 import { useBalanceContext } from "../context/BalanceContext";
 import { spanishDate } from "../myScripts/myMainScript";
+import { useRef } from "react";
+import { FormExpense, FormCollect } from "./CrudForms";
+
+
+function ModalBalance(props) {
+    const { closeModal, editObj, modalTitle } = useBalanceContext();
+    
+    const formRef = useRef(null);
+
+    function handleClick() {
+        if (formRef.current) {
+            formRef.current.requestSubmit();
+        }
+    }
+    
+    return (
+        <div className="modal fade show d-block pg-show-modal" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <div className="modal-dialog" role="document">
+                <div className="modal-content px-3 py-3">
+                    <div className="modal-header">
+                        <h4 className="modal-title">{modalTitle}</h4>
+                        <button className="btn-close" type="button" onClick={closeModal}></button>
+                    </div>
+                    <div className="modal-body">
+                        {props.modelName === 'gasto' ?
+                            <FormExpense formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormExpense> :
+                            <FormCollect formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormCollect> }
+                    </div>
+                    <hr/>
+                    <div className="hstack w-100 justify-content-between">
+                        <div>
+                            
+                        </div>
+                        <div className="hstack gap-3">
+                            <button className="btn btn-default" type="button" onClick={closeModal}>Cancelar</button>
+                            <button className="btn btn-primary" onClick={handleClick}>Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 
 
 function getExpenseLabel(exp) {
@@ -16,14 +60,19 @@ function getExpenseLabel(exp) {
 }
 
 function Expenses() {
-    const { expenses, totalExpenses } = useBalanceContext();
+    const { reId, expenses, totalExpenses, openModal, showModal, setEditObj, handleDelete } = useBalanceContext();
+    
+    const handleEdit = (editObj) => {
+        openModal('gasto', 'edit');
+        setEditObj(editObj)
+    }
 
     return (
         <>
-            {/*showModal && <Modal obj_id={obj_id} />*/}
+            {showModal && reId && (<ModalBalance modelName='gasto' obj_id={reId} />)}
             <div className="hstack">
                 <h4>GASTOS</h4>
-                <button type="button" className="btn btn-primary btn-sm mb-2 ms-3">+</button>
+                <button type="button" className="btn btn-primary btn-sm mb-2 ms-3" onClick={() => openModal('gasto', 'new')}>+</button>
             </div>
             <table className="custom-table border">
                 <thead>
@@ -31,13 +80,13 @@ function Expenses() {
                         <th>FECHA</th>
                         <th>IMPORTE</th>
                         <th>TIPO</th>
-                        <th>GASTO</th>
+                        <th>DETALLE</th>
                         <th>OBS</th>
                         <th></th>
                         <th></th>
                     </tr>
                 </thead>
-                {expenses &&
+                {expenses && expenses.length > 0 && (
                     <tbody>
                         {expenses.map((monthData) => (
                             <React.Fragment key={monthData.month}>
@@ -49,10 +98,10 @@ function Expenses() {
                                         <td>{getExpenseLabel(exp)}</td>
                                         <td>{exp.observations}</td>
                                         <td style={{ width: "10px" }}>
-                                            <button className="btn btn-sm btn-danger" type="button"><i className="bi bi-trash3"></i></button>
+                                            <button className="btn btn-sm btn-danger" type="button"onClick={() => handleDelete('gasto', exp.id)}><i className="bi bi-trash3"></i></button>
                                         </td>
                                         <td style={{ width: "10px" }}>
-                                            <button className="btn btn-sm btn-success" type="button"><i className="bi bi-pencil-square"></i></button>
+                                            <button className="btn btn-sm btn-success" type="button" onClick={() => handleEdit(exp)}><i className="bi bi-pencil-square"></i></button>
                                         </td>
                                     </tr>
                                 ))}
@@ -64,23 +113,96 @@ function Expenses() {
                             </React.Fragment>
                         ))}
                     </tbody>
-                }
-                <tr>
-                    <td colSpan={3} style={{ height: "10px", border: "none" }}></td>
-                </tr>
-                {totalExpenses &&
+                )}
+                {totalExpenses !== null && totalExpenses !== undefined && (
                     <tfoot>
+                        <tr>
+                            <td colSpan={3} style={{ height: "10px", border: "none" }}></td>
+                        </tr>
                         <tr className="fw-bold" style={{backgroundColor: "#2E82FF"}}>
                             <td>TOTAL HISTORICO</td>
                             <td className="text-end">{parseFloat(totalExpenses).toFixed(2)}</td>
                             <td colSpan={5}></td>
                         </tr>
                     </tfoot>
-                }
+                )}
             </table>
         </>
     );
 }
 
 
-export { Expenses }
+function Collects() {
+    const { reId, collects, totalCollects, openModal, showModal, setEditObj, handleDelete } = useBalanceContext();
+    
+    const handleEdit = (editObj) => {
+        openModal('cobro', 'edit');
+        setEditObj(editObj)
+    }
+    
+    return (
+        <>
+            {showModal && reId && (<ModalBalance modelName='cobro' obj_id={reId} />)}
+            <div className="hstack">
+                <h4>COBROS</h4>
+                <button type="button" className="btn btn-primary btn-sm mb-2 ms-3" onClick={() => openModal('cobro', 'new')}>+</button>
+            </div>
+            <table className="custom-table border">
+                <thead>
+                    <tr>
+                        <th>FECHA</th>
+                        <th>IMPORTE</th>
+                        <th>TIPO</th>
+                        <th>DETALLE</th>
+                        <th>OBS</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                {collects && collects.length > 0 && (
+                    <tbody>
+                        {collects.map((monthData) => (
+                            <React.Fragment key={monthData.month}>
+                                {monthData.collects.map((col) => (
+                                    <tr key={col.id}>
+                                        <td>{spanishDate(col.col_date)}</td>
+                                        <td className="text-end">{parseFloat(col.col_value).toFixed(2)}</td>
+                                        <td>{col.col_type}</td>
+                                        <td>{col.col_type == 'OTRO' && col.col_other}</td>
+                                        <td>{col.observations}</td>
+                                        <td style={{ width: "10px" }}>
+                                            <button className="btn btn-sm btn-danger" type="button"onClick={() => handleDelete('cobro', col.id)}><i className="bi bi-trash3"></i></button>
+                                        </td>
+                                        <td style={{ width: "10px" }}>
+                                            <button className="btn btn-sm btn-success" type="button" onClick={() => handleEdit(col)}><i className="bi bi-pencil-square"></i></button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                <tr className="fw-bold" style={{backgroundColor: "#75ACFF"}}>
+                                    <td>Total {monthData.month}:</td>
+                                    <td className="text-end">{parseFloat(monthData.total).toFixed(2)}</td>
+                                    <td colSpan={5}></td>
+                                </tr>
+                            </React.Fragment>
+                        ))}
+                    </tbody>
+                )}
+                {totalCollects !== null && totalCollects !== undefined && (
+                    <tfoot>
+                        <tr>
+                            <td colSpan={3} style={{ height: "10px", border: "none" }}></td>
+                        </tr>
+                        <tr className="fw-bold" style={{backgroundColor: "#2E82FF"}}>
+                            <td>TOTAL HISTORICO</td>
+                            <td className="text-end">{parseFloat(totalCollects).toFixed(2)}</td>
+                            <td colSpan={5}></td>
+                        </tr>
+                    </tfoot>
+                )}
+            </table>
+        </>
+    );
+}
+
+
+export { Expenses, Collects }

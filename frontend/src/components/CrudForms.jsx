@@ -1,26 +1,26 @@
 import { useEffect, useState } from 'react';
-import {validateCuit} from '../myScripts/myMainScript';
-import { useFormHandler } from '../myScripts/useFormHandler';
-import { fetchModelObjectsAPI } from '../services/api_crud';
+import { validateCuit } from '../myScripts/myMainScript';
+import { useBalanceFormHandler, useFormHandler } from '../myScripts/useFormHandler';
+import { fetchModelObjectsAPI, fetchRelatedModelObjectsAPI } from '../services/api_crud';
 import { useDataContext } from '../context/DataContext';
 import TableChecks from './TableChecks';
 
 function FormOwner({ formRef, initialData }) {
     const { register, onSubmit, errors } = useFormHandler(initialData);
-    
+
     return (
         <form ref={formRef} onSubmit={onSubmit}>
             <div className="hstack">
                 <div className="w-100">
                     <label htmlFor="lastName">APELLIDO</label>
-                    <input className="form-control form-control-sm" id="lastName" name="lastName" {...register('last_name')} required autoFocus/>
+                    <input className="form-control form-control-sm" id="lastName" name="lastName" {...register('last_name')} required autoFocus />
                 </div>
                 <div className="w-100 ms-2">
                     <label htmlFor="firstName">NOMBRE</label>
-                    <input className="form-control form-control-sm" id="firstName" name="firstName" {...register('first_name')} required/>
+                    <input className="form-control form-control-sm" id="firstName" name="firstName" {...register('first_name')} required />
                 </div>
             </div>
-            <div className="mt-3" style={{width: "50%"}}>
+            <div className="mt-3" style={{ width: "50%" }}>
                 <label htmlFor="cuit">CUIT</label>
                 <input className="form-control form-control-sm centered-placeholder" id="cuit" name="cuit" placeholder="xx-xxxxxxxx-x" {...register('cuit', { validate: validateCuit })} required />
                 {errors.cuit && <span className="text-danger">{errors.cuit.message}</span>}
@@ -37,17 +37,17 @@ function FormReType({ formRef, initialData }) {
         <form ref={formRef} onSubmit={onSubmit}>
             <div className="w-100">
                 <label htmlFor='re_type'>TIPO DE PROPIEDAD</label>
-                <input className="form-control form-control-sm" id="re_type" name="re_type" {...register('re_type')} required autoFocus/>
+                <input className="form-control form-control-sm" id="re_type" name="re_type" {...register('re_type')} required autoFocus />
             </div>
         </form>
     )
 }
 
 
-function FormRealEstate({ formRef, initialData}) {
+function FormRealEstate({ formRef, initialData }) {
     const { register, onSubmit, setValue } = useFormHandler(initialData);
     const { setError, setLoading } = useDataContext();
-    
+
     const [reTypes, setReTypes] = useState(null);
     const [ownersData, setOwnersData] = useState(null);
     const [selectedOwners, setSelectedOwners] = useState([]);
@@ -86,12 +86,12 @@ function FormRealEstate({ formRef, initialData}) {
                 setLoading(false);
             }
         };
-        
+
         loadTypes();
         loadOwners();
 
         return () => { }
-        
+
     }, []);
 
     useEffect(() => {
@@ -114,16 +114,16 @@ function FormRealEstate({ formRef, initialData}) {
             </div>
             <div className="w-100 mt-3">
                 <label htmlFor='address'>DIRECCION</label>
-                <input className="form-control form-control-sm" id="address" name="address" {...register('address')} required/>
+                <input className="form-control form-control-sm" id="address" name="address" {...register('address')} required />
             </div>
             <div className="hstack w-100 mt-3">
                 <div className='w-100'>
                     <label htmlFor='floor'>PISO</label>
-                    <input className="form-control form-control-sm" id="floor" name="floor" {...register('floor')} type="number" step="1"/>
+                    <input className="form-control form-control-sm" id="floor" name="floor" {...register('floor')} type="number" step="1" />
                 </div>
                 <div className='w-100 ms-2'>
                     <label htmlFor='unit'>UNIDAD</label>
-                    <input className="form-control form-control-sm" id="unit" name="unit" {...register('unit')} type="number" step="1" min="0"/>
+                    <input className="form-control form-control-sm" id="unit" name="unit" {...register('unit')} type="number" step="1" min="0" />
                 </div>
                 <div className='w-100 ms-2'>
                     <label htmlFor='has_garage'>CON COCHERA</label>
@@ -136,7 +136,7 @@ function FormRealEstate({ formRef, initialData}) {
             <hr></hr>
             <div className="w-100 mt-3">
                 <label className='mb-2'>PROPIETARIO/S</label>
-                <TableChecks objs={ownersData} onSelectionChange={setSelectedOwners} initialData={initialOwners}/>
+                <TableChecks objs={ownersData} onSelectionChange={setSelectedOwners} initialData={initialOwners} />
             </div>
             <div className="w-100 mt-3">
                 <label className='mb-2'>USUFRUCTO</label>
@@ -167,7 +167,7 @@ function FormTax({ obj_id, formRef, initialData }) {
     const [hide, setHide] = useState(true)
     const { setError, setLoading } = useDataContext();
     const { register, onSubmit, setValue } = useFormHandler(initialData);
-    
+
     useEffect(() => {
         const loadTypes = async () => {
             try {
@@ -186,14 +186,14 @@ function FormTax({ obj_id, formRef, initialData }) {
 
         return () => { }
     }, [])
-    
+
     useEffect(() => {
         hide && setValue('tax_other', '');
     }, [hide, setValue]);
 
     useEffect(() => {
         if (!taxTypes || taxTypes.length === 0) return;
-        
+
         if (initialData?.tax_type) {
             setValue('tax_type', initialData.tax_type.id);
             setValue('tax_other', initialData.tax_other);
@@ -211,12 +211,12 @@ function FormTax({ obj_id, formRef, initialData }) {
         <form ref={formRef} onSubmit={onSubmit}>
             <div>
                 {!initialData?.real_estate &&
-                    <input type="number" id="real_estate" name="real_estate" value={parseInt(obj_id)} {...register('real_estate')} hidden readOnly/>
+                    <input type="number" id="real_estate" name="real_estate" value={parseInt(obj_id)} {...register('real_estate')} hidden readOnly />
                 }
             </div>
             <div className="w-100">
                 <label htmlFor='tax_type'>TIPO</label>
-                <select className='form-select form-select-sm' id='tax_type' name='tax_type' {...register("tax_type", {onChange: (e) => handleChange(e.target.value)})} required autoFocus>
+                <select className='form-select form-select-sm' id='tax_type' name='tax_type' {...register("tax_type", { onChange: (e) => handleChange(e.target.value) })} required autoFocus>
                     <option value="" disabled></option>
                     {taxTypes && taxTypes.map(item => (
                         <option key={item.id} value={item.id}>{item.tax_type}</option>
@@ -230,11 +230,11 @@ function FormTax({ obj_id, formRef, initialData }) {
             <div className='hstack mt-3'>
                 <div className='w-100'>
                     <label htmlFor='tax_nbr1'>NÚMERO</label>
-                    <input className="form-control form-control-sm" id='tax_nbr1' name='tax_nbr1' {...register('tax_nbr1')} required/>
+                    <input className="form-control form-control-sm" id='tax_nbr1' name='tax_nbr1' {...register('tax_nbr1')} required />
                 </div>
                 <div className='w-100 ms-2'>
                     <label htmlFor='tax_nbr2'>NÚMERO SEC</label>
-                    <input className="form-control form-control-sm" id='tax_nbr2' name='tax_nbr2' {...register('tax_nbr2')}/>
+                    <input className="form-control form-control-sm" id='tax_nbr2' name='tax_nbr2' {...register('tax_nbr2')} />
                 </div>
             </div>
             <div className='w-100 mt-3'>
@@ -257,7 +257,7 @@ function FormTaxType({ formRef, initialData }) {
         <form ref={formRef} onSubmit={onSubmit}>
             <div className="w-100">
                 <label htmlFor='tax_type'>TIPO DE IMPUESTO</label>
-                <input className='form-control form-control-sm' id='tax_type' name='tax_type' {...register('tax_type')} required autoFocus/>
+                <input className='form-control form-control-sm' id='tax_type' name='tax_type' {...register('tax_type')} required autoFocus />
             </div>
         </form>
     )
@@ -289,11 +289,11 @@ function FormRent({ obj_id, formRef, initialData }) {
                 setLoading(false);
             }
         };
-        
+
         loadTenants();
 
         return () => { }
-        
+
     }, []);
 
     useEffect(() => {
@@ -307,13 +307,13 @@ function FormRent({ obj_id, formRef, initialData }) {
         <form ref={formRef} onSubmit={onSubmit}>
             <div>
                 {!initialData?.real_estate &&
-                    <input type="number" id="real_estate" name="real_estate" value={parseInt(obj_id)} {...register('real_estate')} hidden readOnly/>
+                    <input type="number" id="real_estate" name="real_estate" value={parseInt(obj_id)} {...register('real_estate')} hidden readOnly />
                 }
             </div>
             <div className='hstack w-100'>
                 <div className='w-100'>
                     <label htmlFor='date_from'>FECHA INICIO</label>
-                    <input className='form-control form-control-sm' type='date' id='date_from' name='date_from' {...register('date_from')} autoFocus/>
+                    <input className='form-control form-control-sm' type='date' id='date_from' name='date_from' {...register('date_from')} autoFocus />
                 </div>
                 <div className='w-100 ms-2'>
                     <label htmlFor='date_to'>FECHA HASTA</label>
@@ -326,7 +326,7 @@ function FormRent({ obj_id, formRef, initialData }) {
             </div>
             <div className="w-100 mt-3">
                 <label className='mb-2'>INQUILINO/S</label>
-                <TableChecks objs={tenantsData} onSelectionChange={setSelectedTenants} initialData={initialTenants}/>
+                <TableChecks objs={tenantsData} onSelectionChange={setSelectedTenants} initialData={initialTenants} />
             </div>
             <div className='w-100 mt-3'>
                 <label htmlFor='administrator'>ADMINISTRA</label>
@@ -347,13 +347,13 @@ function FormRentStep({ obj_id, formRef, initialData }) {
         <form ref={formRef} onSubmit={onSubmit}>
             <div>
                 {!initialData?.rent &&
-                    <input type="number" id="rent" name="rent" value={parseInt(obj_id)} {...register('rent')} hidden readOnly/>
+                    <input type="number" id="rent" name="rent" value={parseInt(obj_id)} {...register('rent')} hidden readOnly />
                 }
             </div>
             <div className='hstack w-100'>
                 <div className='w-100'>
                     <label htmlFor='date_from'>FECHA DESDE</label>
-                    <input className='form-control form-control-sm' type='date' id='date_from' name='date_from' {...register('date_from')} autoFocus/>
+                    <input className='form-control form-control-sm' type='date' id='date_from' name='date_from' {...register('date_from')} autoFocus />
                 </div>
                 <div className='w-100 ms-2'>
                     <label htmlFor='date_to'>FECHA HASTA</label>
@@ -373,4 +373,150 @@ function FormRentStep({ obj_id, formRef, initialData }) {
 }
 
 
-export { FormOwner, FormReType, FormRealEstate, FormTax, FormTaxType, FormRent, FormRentStep};
+function FormExpense({ obj_id, formRef, initialData }) {
+    const [taxes, setTaxes] = useState([])
+    const [hide, setHide] = useState(true)
+    const { setError, setLoading } = useDataContext();
+    const { register, onSubmit, setValue } = useBalanceFormHandler('gasto', initialData);
+
+    useEffect(() => {
+        const loadTaxes = async () => {
+            try {
+                const fetchedData = await fetchRelatedModelObjectsAPI('impuesto', '1', 'real_estate', obj_id);
+                const newTaxes = fetchedData.map(tax => {
+                    const tax_id = tax.id;
+                    const tax_str = tax.tax_type.tax_type === 'OTRO' ? tax.tax_other : tax.tax_type.tax_type;
+                    return { id: tax_id, tax_text: tax_str };
+                });
+                setTaxes(newTaxes);
+            } catch (err) {
+                setError(err);
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadTaxes();
+    }, []);
+
+    useEffect(() => {
+        if (!taxes || taxes.length === 0) return;
+        if (initialData) {
+            handleChange(initialData.expense_type)
+            initialData?.tax && setValue('tax', initialData.tax.id)
+        }
+    }, [taxes, setValue]);
+
+    const handleChange = (optValue) => {
+        if (optValue == 'OTRO') {
+            setHide(false)
+            setValue('tax', null)
+        } else {
+            setHide(true)
+            setValue('other_expense', '')
+        }
+    }
+
+    return (
+        <>
+            <form ref={formRef} onSubmit={onSubmit}>
+                <div>
+                    {!initialData?.real_estate &&
+                        <input type="number" id="real_estate" name="real_estate" value={parseInt(obj_id)} {...register('real_estate')} hidden readOnly />
+                    }
+                </div>
+                <div className='hstack w-100'>
+                    <div className="w-100">
+                        <label htmlFor='pay_date'>FECHA</label>
+                        <input className='form-control form-control-sm' type='date' id='pay_date' name='pay_date' defaultValue={new Date().toISOString().split('T')[0]} {...register('pay_date')} required autoFocus />
+                    </div>
+                    <div className="w-100 ms-2">
+                        <label htmlFor='pay_value'>IMPORTE</label>
+                        <input className='form-control form-control-sm' type='number' step='0.01' min='0' id='pay_value' name='pay_value' {...register('pay_value')} required />
+                    </div>
+                </div>
+                <div className='w-100 mt-3'>
+                    <label htmlFor='expense_type'>TIPO DE GASTO</label>
+                    <select className='form-select form-select-sm' id='expense_type' name='expense_type' {...register('expense_type', { onChange: (e) => handleChange(e.target.value) })} required>
+                        <option>IMPUESTO</option>
+                        <option>OTRO</option>
+                    </select>
+                </div>
+                <div className='w-100 mt-3'>
+                    <div className="w-100" hidden={hide}>
+                        <label htmlFor='other_expense'>DETALLE</label>
+                        <input className="form-control form-control-sm" id="other_expense" name="other_expense" {...register('other_expense')} required={!hide} />
+                    </div>
+                    <div className="w-100" hidden={!hide}>
+                        <label htmlFor='tax'>DETALLE</label>
+                        <select className='form-select form-select-sm' id='tax' name='tax' {...register('tax')} required={hide}>
+                            <option></option>
+                            {taxes && taxes.map(item => (
+                                <option key={item.id} value={item.id}>{item.tax_text}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+                <div className='w-100 mt-3'>
+                    <label htmlFor='observations'>OBSERVACIONES</label>
+                    <input className='form-control form-control-sm' id='observations' name='observations' {...register('observations')} />
+                </div>
+            </form>
+        </>
+    )
+}
+
+
+function FormCollect({ obj_id, formRef, initialData }) {
+    const [hide, setHide] = useState(true)
+    const { register, onSubmit } = useBalanceFormHandler('cobro', initialData);
+
+    useEffect(() => {
+        initialData && handleChange(initialData.col_type)
+    }, []);
+
+    const handleChange = (optValue) => {
+        optValue == 'OTRO' ? setHide(false) : setHide(true);
+    }
+
+    return (
+        <>
+            <form ref={formRef} onSubmit={onSubmit}>
+                <div>
+                    {!initialData?.real_estate &&
+                        <input type="number" id="real_estate" name="real_estate" value={parseInt(obj_id)} {...register('real_estate')} hidden readOnly />
+                    }
+                </div>
+                <div className='hstack w-100'>
+                    <div className="w-100">
+                        <label htmlFor='col_date'>FECHA</label>
+                        <input className='form-control form-control-sm' type='date' id='col_date' name='col_date' defaultValue={new Date().toISOString().split('T')[0]} {...register('col_date')} required autoFocus />
+                    </div>
+                    <div className="w-100 ms-2">
+                        <label htmlFor='col_value'>IMPORTE</label>
+                        <input className='form-control form-control-sm' type='number' step='0.01' min='0' id='col_value' name='col_value' {...register('col_value')} required />
+                    </div>
+                </div>
+                <div className='w-100 mt-3'>
+                    <label htmlFor='expense_type'>TIPO DE COBRO</label>
+                    <select className='form-select form-select-sm' id='col_type' name='col_type' {...register('col_type', { onChange: (e) => handleChange(e.target.value) })} required>
+                        <option>ALQUILER</option>
+                        <option>OTRO</option>
+                    </select>
+                </div>
+                <div className="w-100 mt-3" hidden={hide}>
+                    <label htmlFor='other_expense'>DETALLE</label>
+                    <input className="form-control form-control-sm" id="col_other" name="col_other" {...register('col_other')} required={!hide} />
+                </div>
+                <div className='w-100 mt-3'>
+                    <label htmlFor='observations'>OBSERVACIONES</label>
+                    <input className='form-control form-control-sm' id='observations' name='observations' {...register('observations')} />
+                </div>
+            </form>
+        </>
+    )
+}
+
+
+export { FormOwner, FormReType, FormRealEstate, FormTax, FormTaxType, FormRent, FormRentStep, FormExpense, FormCollect };

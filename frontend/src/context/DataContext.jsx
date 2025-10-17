@@ -179,8 +179,10 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
                 await deleteObjAPI(modelName, deleteId);
                 setModelData(prev => prev.filter(deleteObj => deleteObj.id !== deleteId));
                 closeModal();
-                const basePath = `/${modelName}/`;
-                navigate(basePath)
+                if (modelName === 'propiedad') {
+                    const basePath = `/${modelName}/`;
+                    navigate(basePath)   
+                }
             } catch (err) {
                 setError(err);
                 console.error(err);

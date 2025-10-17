@@ -22,6 +22,8 @@ models_dic = {
     'impuesto': Tax,
     'alquiler': Rent,
     'escalon': RentStep,
+    'gasto': Expense,
+    'cobro': Collect
 }
 
 
@@ -187,10 +189,9 @@ def fetch_balance(request, re_id):
     collects_data = format_balance_data(
         model=Collect,
         re_id=re_id,
-        serializer_class=get_serializer_class(Collect, '__all__', 2),
-        date_field='collect_date',
-        value_field='collect_value',
-        nested_fields_to_remove=['rent']
+        serializer_class=get_serializer_class(Collect, '__all__', 0),
+        date_field='col_date',
+        value_field='col_value',
     )
 
     result = {
@@ -200,5 +201,4 @@ def fetch_balance(request, re_id):
     }
 
     print(result)
-
     return Response(result, status=status.HTTP_200_OK)

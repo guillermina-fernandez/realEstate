@@ -3,7 +3,7 @@ import Modal from "../components/Modal";
 import { useDataContext, DataProvider } from "../context/DataContext";
 import { BalanceProvider } from "../context/BalanceContext";
 import { useEffect, useState } from "react";
-import { Expenses } from "../components/Balance";
+import { Expenses, Collects } from "../components/Balance";
 
 
 function get_persons(personsString) {
@@ -305,30 +305,18 @@ function RealEstate() {
                             <Rent obj_id={reId} />
                         </DataProvider>
                     </div>
-                    <div className="hstack w-100 mt-3">
-                        <div style={{
-                            width: "50%",
-                            minHeight: "300px",
-                            overflowX: "auto",           // Horizontal scroll when needed
-                            overflowY: "auto",           // Vertical scroll when needed
-                            maxWidth: "50%"              // Enforce max width
-                        }}>
+                    <div className="hstack w-100 mt-3" style={{ alignItems: "flex-start" }}>
+                        <div className='border' style={{ width: "50%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "50%" }}>
                             {reId &&
-                                <BalanceProvider reId={reId}>
+                                <BalanceProvider reId={reId} modelName='gasto'>
                                     <Expenses />
                                 </BalanceProvider>
                             }
                         </div>
-                        <div className="ms-5" style={{
-                            width: "50%",
-                            minHeight: "300px",
-                            overflowX: "auto",
-                            overflowY: "auto",
-                            maxWidth: "50%"
-                        }}>
+                        <div className="border ms-5" style={{ width: "50%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "50%" }}>
                             {reId &&
-                                <BalanceProvider reId={reId}>
-                                    <Expenses />
+                                <BalanceProvider reId={reId} modelName='cobro'>
+                                    <Collects />
                                 </BalanceProvider>
                             }
                         </div>
