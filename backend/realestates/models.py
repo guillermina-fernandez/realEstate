@@ -174,10 +174,12 @@ class Agenda(models.Model):
     detail = models.CharField(max_length=500, blank=True, null=True)
 
     def clean(self):
-        if self.action_detail == 'OTRO' and not self.detail:
+        if (self.action == 'OTRO' or self.action_detail == 'OTRO') and not self.detail:
             raise ValidationError('Ingrese un detalle')
         if self.action_detail == 'IMPUESTO' and not self.tax_to_pay:
             raise ValidationError('Seleccione un impuesto a pagar')
+        if self.action_detail == 'IMPUESTO' and not self.real_estate:
+            raise ValidationError('Ingrese una propiedad')
 
     def save(self, *args, **kwargs):
         self.full_clean()
