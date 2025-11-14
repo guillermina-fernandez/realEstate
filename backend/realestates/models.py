@@ -163,3 +163,25 @@ class Collect(models.Model):
     class Meta:
         ordering = ('-col_date', )
 
+
+class Agenda(models.Model):
+    real_estate = models.ForeignKey(RealEstate, related_name='agenda_re', on_delete=models.CASCADE, blank=True, null=True)
+    agenda_date = models.DateField()
+    agenda_value = models.FloatField()
+    action = models.CharField(max_length=6)
+    action_detail = models.CharField(max_length=8)
+    tax_to_pay = models.ForeignKey(Tax, related_name='agenda_tax', on_delete=models.RESTRICT, blank=True, null=True)
+    detail = models.CharField(max_length=500, blank=True, null=True)
+
+    def clean(self):
+        if self.action_detail == 'OTRO' and not self.detail:
+            raise ValidationError('Ingrese un detalle')
+        if self.action_detail == 'IMPUESTO' and not self.tax_to_pay:
+            raise ValidationError('Seleccione un impuesto a pagar')
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['agenda_date']

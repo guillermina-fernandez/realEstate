@@ -288,7 +288,7 @@ function RealEstate() {
         <>
             <div>
                 <h1>{reName}</h1>
-                <div className="w-100 mt-3">
+                <div className="w-100 mt-5">
                     <div className="hstack w-100">
                         <div style={{ width: "40%", minHeight: "300px", overflowX: "auto", overflowY: "auto", maxWidth: "40%" }}>
                             <h4 className="text-start">DATOS</h4>
