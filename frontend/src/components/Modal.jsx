@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDataContext } from '../context/DataContext';
-import {FormOwner, FormRealEstate, FormReType, FormTax, FormTaxType, FormRent, FormRentStep} from './CrudForms';
+import { FormOwner, FormRealEstate, FormReType, FormTax, FormTaxType, FormRent, FormRentStep } from './CrudForms';
+import FormAgenda from './AgendaForm';
 
 
 function Modal(props) {
@@ -37,6 +38,7 @@ function Modal(props) {
                         {modelName === "impuesto" && <FormTax formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormTax>}
                         {modelName === 'alquiler' && <FormRent formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormRent>}
                         {modelName === 'escalon' && <FormRentStep formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormRentStep>}
+                        {modelName === 'agenda' && <FormAgenda formRef={formRef} initialData={editObj}></FormAgenda>}
                     </div>
                     <hr/>
                     <div className="hstack w-100 justify-content-between">

@@ -4,7 +4,7 @@ import TableAgenda from "../components/TableAgenda";
 
 
 function Agenda() {
-    const { modelName, modelConfig, showModal, openModal } = useDataContext();
+    const { showModal, openModal } = useDataContext();
     
     return (
         <div>

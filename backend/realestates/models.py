@@ -179,21 +179,6 @@ class Agenda(models.Model):
         re_name = self.real_estate.re_name if self.real_estate else ''
         return re_name
 
-    @property
-    def tax_name(self):
-        tax_name = ''
-        if self.tax.tax_type_id:
-            tax_type_obj = TaxType.objects.get(id=self.tax.tax_type_id)
-            if tax_type_obj.tax_type == 'OTRO':
-                tax_name += self.tax.tax_other
-            else:
-                tax_name += self.tax.tax_type.tax_type
-        tax_name += f' ({self.tax.tax_nbr1}'
-        if self.tax.tax_nbr2:
-            tax_name += f' / {self.tax.tax_nbr2}'
-        tax_name += ')'
-        return tax_name
-
     def clean(self):
         if (self.action == 'OTRO' or self.action_detail == 'OTRO') and not self.detail:
             raise ValidationError('Ingrese un detalle')

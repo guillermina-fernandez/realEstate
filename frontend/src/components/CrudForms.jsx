@@ -561,4 +561,103 @@ function FormCollect({ obj_id, formRef, initialData }) {
 }
 
 
-export { FormOwner, FormReType, FormRealEstate, FormTax, FormTaxType, FormRent, FormRentStep, FormExpense, FormCollect };
+
+/*
+function FormAgenda({ formRef, initialData }) {
+    const [realEstates, setRealEstates] = useState()
+    const [actionDetailOpts, setActionDetailOpts] = useState([]);
+    const [otherAction, setOtherAction] = useState(false)
+
+    const { setError, setLoading } = useDataContext();
+    const { register, onSubmit, setValue } = useFormHandler(initialData);
+
+    useEffect(() => {
+        const loadEstates = async () => {
+            try {
+                const fetchedData = await fetchModelObjectsAPI('propiedad', '0');
+                const reNames = fetchedData.map(item => item.re_name);
+                setRealEstates(reNames)
+            } catch (err) {
+                setError(err);
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadEstates();
+
+        return () => { }
+    }, [])
+
+    useEffect(() => {
+        if (initialData?.action) {
+            handleActionChange(initialData.action);
+        } else {
+            handleActionChange("PAGAR");
+        }
+    }, []);
+
+    function handleActionChange(action) {
+        setValue('detail', '');
+        if (action === 'PAGAR') {
+            setOtherAction(false);
+            setActionDetailOpts(['IMPUESTO', 'OTRO']);
+            setValue('action_detail', 'IMPUESTO');
+        } else if (action === 'COBRAR') {
+            setOtherAction(false);
+            setActionDetailOpts(['ALQUILER', 'OTRO']);
+            setValue('action_detail', 'ALQUILER');
+        } else {
+            setOtherAction(true);
+            setActionDetailOpts([]);
+            setValue('action_detail', 'OTRO')
+        }
+    }
+
+    return (
+        <form ref={formRef} onSubmit={onSubmit}>
+            <div className='hstack w-100'>
+                <div className='w-100'>
+                    <label htmlFor='agenda_date'>FECHA</label>
+                    <input type='date' className='form-control form-control-sm' id='agenda_date' name='agenda_date' {...register('agenda_date')} required autoFocus />
+                </div>
+                <div className='w-100 ms-2'>
+                    <label htmlFor='action'>ACCION</label>
+                    <select className='form-select form-select-sm' id='action' name='action'  {...register('action', { onChange: (e) => handleActionChange(e.target.value) })}>
+                        <option>PAGAR</option>
+                        <option>COBRAR</option>
+                        <option>OTRO</option>
+                    </select>
+                </div>
+                <div className='w-100 ms-2'>
+                    <label htmlFor='action_detail'>DETALLE</label>
+                    {!otherAction ? (
+                        <select key={actionDetailOpts.join('-')} className='form-select form-select-sm' id='action_detail' name='action_detail' {...register('action_detail')}>
+                            {actionDetailOpts.map(opt => (
+                                <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                        </select>
+                    ) : (
+                        <input className='form-control form-control-sm' id='detail' name='detail' {...register('detail')} required />
+                    )}
+                </div>
+            </div>
+            <div className='hstack w-100 mt-3'>
+                <div className='w-100'>
+                    <label htmlFor='agenda_value'>IMPORTE</label>
+                    <input type='number' step='0.01' min='0' className='form-control form-control-sm' id='agenda_value' name='agenda_value'/>
+                </div>
+            </div>
+            <div className='hstack w-100 mt-3'>
+                <div className='w-100'>
+                    <label htmlFor='agenda_value'>IMPORTE</label>
+                    <input type='number' step='0.01' min='0' className='form-control form-control-sm' id='agenda_value' name='agenda_value'/>
+                </div>
+            </div>
+        </form>
+    )
+}*/
+
+
+export { FormOwner, FormReType, FormRealEstate, FormTax, FormTaxType, FormRent, FormRentStep, FormExpense, FormCollect};

@@ -97,6 +97,8 @@ def create_object(request, model_name, depth):
             instance = serializer.save()
             if model_name == 'propiedad':
                 serializer = RealEstateCustomSerializer(instance=instance)
+            elif model_name == 'agenda':
+                serializer = AgendaCustomSerializer(instance=instance)
             else:
                 serializer_class = get_serializer_class(models_dic[model_name], '__all__', int(depth))
                 serializer = serializer_class(instance=instance)
@@ -140,6 +142,8 @@ def update_object(request, model_name, obj_id, depth):
             instance = serializer.save()
             if model_name == 'propiedad':
                 serializer = RealEstateCustomSerializer(instance=instance)
+            elif model_name == 'agenda':
+                serializer = AgendaCustomSerializer(instance=instance)
             else:
                 serializer_class = get_serializer_class(models_dic[model_name], '__all__', int(depth))
                 serializer = serializer_class(instance=instance)

@@ -154,3 +154,5 @@ class AgendaCustomSerializer(serializers.ModelSerializer):
             "re_name",
             "tax_name",
         ]
+        depth = 2
+

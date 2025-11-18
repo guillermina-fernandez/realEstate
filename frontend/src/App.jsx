@@ -35,7 +35,7 @@ function App() {
           </DataProvider>
         } />
         <Route path="/agenda" element={
-          <DataProvider modelName='agenda' modelDepth='2' modelId={null} relatedModel={null} relatedModelDepth={null} relatedFieldName={null}>
+          <DataProvider modelName='agenda' modelDepth='0' modelId={null} relatedModel={null} relatedModelDepth={null} relatedFieldName={null}>
               <Agenda />
           </DataProvider>
         } />

@@ -3,7 +3,7 @@ import { useDataContext } from "../context/DataContext";
 import { spanishDate } from "../myScripts/myMainScript";
 
 function TableAgenda() {
-    const { modelData } = useDataContext();
+    const { modelData, handleDelete, setEditObj, openModal } = useDataContext();
     const [showData, setShowData] = useState([])
 
     useEffect(() => {
@@ -14,8 +14,41 @@ function TableAgenda() {
         }
     }, [modelData])
 
+    const handleEdit = (editObj) => {
+        openModal('edit');
+        const newObj = {
+            id: editObj.id,
+            action: editObj.action,
+            action_detail: editObj.action_detail,
+            agenda_date: editObj.agenda_date,
+            agenda_value: editObj.agenda_value,
+            detail: editObj.detail,
+            observations: editObj.observations,
+            real_estate: editObj.real_estate?.id || null,
+            tax: editObj.tax?.id || null,
+        }
+        setEditObj(newObj)
+    }
+
     function getDetail(agendaItem) {
-        if (agendaItem.action_detail === 'IMPUESTO') return agendaItem.tax_name;
+        if (agendaItem.action_detail === 'IMPUESTO') {
+            let tax_name = '';
+
+            if (agendaItem.tax) {
+                const taxObj = agendaItem.tax;
+                const taxType = taxObj.tax_type.tax_type === 'OTRO' ? taxObj.tax_other : taxObj.tax_type.tax_type;
+                const taxNbr1 = taxObj.tax_nbr1;
+                const taxNbr2 = taxObj.tax_nbr2 || null;
+
+                tax_name += taxType
+                tax_name += ` (${taxNbr1}`;
+                if (taxNbr2) {
+                    tax_name += ` / ${taxNbr2}`;
+                }
+                tax_name += ')';
+            }
+            return tax_name;
+        }
         if (agendaItem.action_detail === 'ALQUILER') return agendaItem.action_detail;
         return agendaItem.detail;
     }
@@ -23,7 +56,7 @@ function TableAgenda() {
     function getExpiration(dateString) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         const date_parts = dateString.split('-');
         const year = parseInt(date_parts[0]);
         const month = parseInt(date_parts[1]) - 1;
@@ -40,12 +73,10 @@ function TableAgenda() {
         } else if (diff_days === 0) {
             return 'bg-danger-today';
         } else if (diff_days > 0 && diff_days < 5) {
-            return 'bg-warning-subtle';
+            return 'bg-danger-soon';
         }
         return '';
     }
-
-    console.log(showData);
 
     return (
         <div>
@@ -58,6 +89,7 @@ function TableAgenda() {
                         <th>DETALLE</th>
                         <th>PROPIEDAD</th>
                         <th>OBS</th>
+                        <th></th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -75,10 +107,13 @@ function TableAgenda() {
                             <td>{dataItem.re_name}</td>
                             <td>{dataItem.observations}</td>
                             <td style={{ width: "10px" }}>
-                                <button className="btn btn-sm btn-success" type="button"><i className="bi bi-pencil-square"></i></button>
+                                <button className="btn btn-sm btn-danger" type="button" onClick={() => handleDelete(dataItem.id)}><i className="bi bi-trash3"></i></button>
                             </td>
-                            <td>
-
+                            <td style={{ width: "10px" }}>
+                                <button className="btn btn-sm btn-success" type="button" onClick={() => handleEdit(dataItem)}><i className="bi bi-pencil-square"></i></button>
+                            </td>
+                            <td style={{ width: "10px" }}>
+                                <button className="btn btn-sm" type="button" style={{ backgroundColor: "#91ff00ff" }}><i className="bi bi-check-square"></i></button>
                             </td>
                         </tr>
                     )}
