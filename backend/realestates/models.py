@@ -167,19 +167,42 @@ class Collect(models.Model):
 class Agenda(models.Model):
     real_estate = models.ForeignKey(RealEstate, related_name='agenda_re', on_delete=models.CASCADE, blank=True, null=True)
     agenda_date = models.DateField()
-    agenda_value = models.FloatField()
-    action = models.CharField(max_length=6)
-    action_detail = models.CharField(max_length=8)
-    tax_to_pay = models.ForeignKey(Tax, related_name='agenda_tax', on_delete=models.RESTRICT, blank=True, null=True)
+    agenda_value = models.FloatField(blank=True, null=True)
+    action = models.CharField(max_length=6)  # PAGAR/COBRAR/OTRO
+    action_detail = models.CharField(max_length=8)  # IMPUESTO/ALQUILER/OTRO
     detail = models.CharField(max_length=500, blank=True, null=True)
+    tax = models.ForeignKey(Tax, related_name='agenda_tax', on_delete=models.RESTRICT, blank=True, null=True)
+    observations = models.CharField(max_length=500, blank=True, null=True)
+
+    @property
+    def re_name(self):
+        re_name = self.real_estate.re_name if self.real_estate else ''
+        return re_name
+
+    @property
+    def tax_name(self):
+        tax_name = ''
+        if self.tax.tax_type_id:
+            tax_type_obj = TaxType.objects.get(id=self.tax.tax_type_id)
+            if tax_type_obj.tax_type == 'OTRO':
+                tax_name += self.tax.tax_other
+            else:
+                tax_name += self.tax.tax_type.tax_type
+        tax_name += f' ({self.tax.tax_nbr1}'
+        if self.tax.tax_nbr2:
+            tax_name += f' / {self.tax.tax_nbr2}'
+        tax_name += ')'
+        return tax_name
 
     def clean(self):
         if (self.action == 'OTRO' or self.action_detail == 'OTRO') and not self.detail:
             raise ValidationError('Ingrese un detalle')
-        if self.action_detail == 'IMPUESTO' and not self.tax_to_pay:
+        if self.action_detail == 'IMPUESTO' and not self.tax:
             raise ValidationError('Seleccione un impuesto a pagar')
         if self.action_detail == 'IMPUESTO' and not self.real_estate:
             raise ValidationError('Ingrese una propiedad')
+        if (self.action == 'PAGAR' or self.action == 'COBRAR') and not self.agenda_value:
+            raise ValidationError('Ingrese un importe')
 
     def save(self, *args, **kwargs):
         self.full_clean()

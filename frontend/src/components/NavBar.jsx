@@ -6,6 +6,11 @@ function NavBar() {
             <div className="container-fluid d-flex flex-wrap">
                 <ul className="navbar-nav me-auto mb-lg-0 hstack">
                     <li className="nav-item">
+                        <Link className="nav-link" to="/agenda">AGENDA</Link>
+                    </li>
+                </ul>
+                <ul className="navbar-nav me-auto mb-lg-0 hstack">
+                    <li className="nav-item">
                         <Link className="nav-link" to="/propiedad">PROPIEDADES</Link>
                     </li>
                 </ul>

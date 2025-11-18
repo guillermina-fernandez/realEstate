@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from common.validators import UniqueTogetherWithNullAsEmpty
 
-from realestates.models import RealEstate
+from realestates.models import RealEstate, Agenda
 
 
 def get_serializer_class(model_obj, field_names, depth_nbr):
@@ -133,3 +133,24 @@ class RealEstateCustomSerializer(serializers.ModelSerializer):
 
 
 RealEstateCustomSerializer.attach_validators()
+
+
+class AgendaCustomSerializer(serializers.ModelSerializer):
+    re_name = serializers.ReadOnlyField()
+    tax_name = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Agenda
+        fields = [
+            "id",
+            "real_estate",
+            "agenda_date",
+            "agenda_value",
+            "action",
+            "action_detail",
+            'detail',
+            "tax",
+            "observations",
+            "re_name",
+            "tax_name",
+        ]

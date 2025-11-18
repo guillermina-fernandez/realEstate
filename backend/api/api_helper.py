@@ -8,10 +8,10 @@ from django.db.models import ProtectedError, RestrictedError
 
 from common.validators import normalize_form_data, format_balance_data
 
-from api.serializers import get_serializer_class, RealEstateCustomSerializer
+from api.serializers import get_serializer_class, RealEstateCustomSerializer, AgendaCustomSerializer
 
 from parameters.models import Owner, Tenant, RealEstateType, TaxType
-from realestates.models import RealEstate, Tax, Rent, RentStep, Expense, Collect
+from realestates.models import RealEstate, Tax, Rent, RentStep, Expense, Collect, Agenda
 
 models_dic = {
     'propietario': Owner,
@@ -23,7 +23,8 @@ models_dic = {
     'alquiler': Rent,
     'escalon': RentStep,
     'gasto': Expense,
-    'cobro': Collect
+    'cobro': Collect,
+    'agenda': Agenda,
 }
 
 
@@ -31,6 +32,8 @@ models_dic = {
 def fetch_objects(request, model_name, depth):
     if model_name == 'propiedad':
         serializer = RealEstateCustomSerializer(RealEstate.objects.all(), many=True)
+    elif model_name == 'agenda':
+        serializer = AgendaCustomSerializer(Agenda.objects.all(), many=True)
     else:
         serializer_class = get_serializer_class(
             models_dic[model_name], '__all__', int(depth)

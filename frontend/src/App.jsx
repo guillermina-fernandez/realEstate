@@ -4,6 +4,7 @@ import Crud from './pages/Crud'
 import { DataProvider } from './context/DataContext'
 import RealEstate from './pages/RealEstate'
 import NavBar from './components/NavBar'
+import Agenda from './pages/Agenda'
 
 
 function App() {
@@ -31,6 +32,11 @@ function App() {
         <Route path="/propiedad/:obj_id" element={
           <DataProvider modelName='propiedad' modelDepth='0' modelId={null} relatedModel={null} relatedModelDepth={null} relatedFieldName={null}>
               <RealEstate />
+          </DataProvider>
+        } />
+        <Route path="/agenda" element={
+          <DataProvider modelName='agenda' modelDepth='2' modelId={null} relatedModel={null} relatedModelDepth={null} relatedFieldName={null}>
+              <Agenda />
           </DataProvider>
         } />
       </Routes>

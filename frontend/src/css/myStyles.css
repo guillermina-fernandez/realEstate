@@ -70,3 +70,8 @@ td {
   top: 0;
   z-index: 2;
 }
+
+/* EXPIRATION COLORS */
+.bg-danger-due { background-color: #f70f23; }
+.bg-danger-today { background-color: #f06363; }
+.bg-warning-subtle { background-color: #f8a830; }
