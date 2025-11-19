@@ -156,8 +156,10 @@ function FormAgenda({ formRef, initialData }) {
 
         // Reset fields
         setValue('detail', '');
-        setAgendaValue('');
-        setValue('agenda_value', '');
+        if (!initialData) {
+            setAgendaValue('');
+            setValue('agenda_value', '');
+        }
         setValue('tax', '');
 
         if (action === 'PAGAR') {
@@ -193,8 +195,10 @@ function FormAgenda({ formRef, initialData }) {
     function handleActionDetailChange(action, actionDetail, currentRealEstate = null) {
         setSelectedActionDetail(actionDetail);
         setValue('detail', '');
-        setAgendaValue('');
-        setValue('agenda_value', '');
+        if (!initialData) {
+            setAgendaValue('');
+            setValue('agenda_value', '');
+        }
         setValue('tax', '');
         setTaxes([]);
 
