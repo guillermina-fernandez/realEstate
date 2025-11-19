@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { fetchModelObjectsAPI, fetchRelatedModelObjectsAPI, createObjDataAPI, updateObjDataAPI, deleteObjAPI, fetchObjDataAPI } from "../services/api_crud";
 import { useParams, useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const modelConfig = {
     propietario: {
@@ -98,18 +99,35 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
                 setLoading(false);
             }
         };
-        
+
         loadData();
 
         return () => { }
-        
+
     }, [modelName, obj_id, modelId, relatedModel]);
 
     // Alert error (if any)
     useEffect(() => {
-        if (error) {
-            alert(error);
+        if (!error) return;
+
+        let message = error;
+
+        // If error is an Error object
+        if (error instanceof Error) {
+            message = error.message;
         }
+
+        // If backend sends an object like: { field: ["message"] }
+        else if (typeof error === "object") {
+            const firstKey = Object.keys(error)[0];
+            if (firstKey && Array.isArray(error[firstKey])) {
+                message = error[firstKey][0];
+            } else {
+                message = JSON.stringify(error); // fallback
+            }
+        }
+
+        toast.error(message);
     }, [error]);
 
     // Render loading .gif or something
@@ -144,9 +162,9 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
     }
 
     // Handle modal:
-    const openModal = (action) => {        
+    const openModal = (action) => {
         if (action == 'new') {
-            setModalTitle(`Agregar ${objName}`)    
+            setModalTitle(`Agregar ${objName}`)
         } else if (action == 'edit') {
             setModalTitle(`Editar ${objName}`)
         } else {
@@ -155,24 +173,24 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
         setShowModal(true);
         setEditObj(null);
     };
-    
+
     const closeModal = () => {
         setShowModal(false);
         setEditObj(null);
     };
 
     // Delete obj:
-    const handleDelete = async (deleteId) => {        
+    const handleDelete = async (deleteId) => {
         const objToDelete = modelData.find(deleteObj => deleteObj.id === deleteId);
-        
+
         if (!objToDelete) return
         let message = 'ATENCIÓN!\nSe eliminará el siguiente registro y todas sus dependencias:\n';
         Object.values(objToDelete).forEach(value => {
             message += value + ' - ';
         })
-        
+
         const accepted = confirm(message.slice(0, -3));
-        
+
         if (accepted) {
             setLoading(true);
             try {
@@ -181,7 +199,7 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
                 closeModal();
                 if (modelName === 'propiedad') {
                     const basePath = `/${modelName}/`;
-                    navigate(basePath)   
+                    navigate(basePath)
                 }
             } catch (err) {
                 setError(err);
@@ -241,17 +259,17 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
             setModelData(prev => {
                 const updated = prev.map(item =>
                     item.id === newData.id ? newData : item
-                ); 
+                );
                 return sortData(updated);
-            });    
+            });
         } else {
             setModelData(newData);
         }
     }
 
     const sortData = (sortedData) => {
-    const sortByFields = modelConfig[modelName]?.sortBy || [];
-    if (!sortByFields.length) return sortedData;
+        const sortByFields = modelConfig[modelName]?.sortBy || [];
+        if (!sortByFields.length) return sortedData;
         return [...sortedData].sort((a, b) => {
             for (const field of sortByFields) {
                 const aVal = a?.[field] ?? "";
@@ -272,7 +290,7 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
         setLoading,
         loading,
         setError,
-        showModal, 
+        showModal,
         openModal,
         modalTitle,
         objName,
