@@ -136,7 +136,10 @@ function TableAgenda() {
                                 style={{ width: "1%", whiteSpace: "nowrap" }}
                             >{spanishDate(dataItem.agenda_date)}</td>
                             <td className="fw-bold" style={{ width: "1%", whiteSpace: "nowrap" }}>{dataItem.action !== 'OTRO' && dataItem.action}</td>
-                            <td className="fw-bold text-end" style={{ width: "1%", whiteSpace: "nowrap" }}>{dataItem.agenda_value && parseFloat(dataItem.agenda_value).toFixed(2)}</td>
+                            <td className="fw-bold text-end" style={{ width: "1%", whiteSpace: "nowrap" }}>{dataItem.agenda_value && parseFloat(dataItem.agenda_value).toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })}</td>
                             <td className="fw-bold">{getDetail(dataItem)}</td>
                             <td>{dataItem.re_name}</td>
                             <td>{dataItem.observations}</td>

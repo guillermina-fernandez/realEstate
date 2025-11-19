@@ -19,7 +19,7 @@ function ModalBalance(props) {
 
     return (
         <>
-            {loading && <Loading/>}
+            {loading && <Loading />}
             <div className="modal fade show d-block pg-show-modal" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
                 <div className="modal-dialog" role="document">
                     <div className="modal-content px-3 py-3">
@@ -97,7 +97,10 @@ function Expenses() {
                                 {monthData.expenses.map((exp) => (
                                     <tr key={exp.id}>
                                         <td style={{ width: "1%", whiteSpace: "nowrap" }}>{spanishDate(exp.pay_date)}</td>
-                                        <td className="text-end" style={{ width: "1%", whiteSpace: "nowrap" }}>{parseFloat(exp.pay_value).toFixed(2)}</td>
+                                        <td className="text-end" style={{ width: "1%", whiteSpace: "nowrap" }}>{parseFloat(exp.pay_value).toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })}</td>
                                         <td className="text-center">{exp.expense_type}</td>
                                         <td className="text-center">{getExpenseLabel(exp)}</td>
                                         <td className="text-center">{exp.observations}</td>
@@ -111,7 +114,10 @@ function Expenses() {
                                 ))}
                                 <tr className="fw-bold" style={{ backgroundColor: "#E6F07A" }}>
                                     <td>Total {monthData.month}:</td>
-                                    <td className="text-end">{parseFloat(monthData.total).toFixed(2)}</td>
+                                    <td className="text-end">{parseFloat(monthData.total).toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })}</td>
                                     <td colSpan={5}></td>
                                 </tr>
                             </React.Fragment>
@@ -125,7 +131,10 @@ function Expenses() {
                         </tr>
                         <tr className="fw-bold" style={{ backgroundColor: "#F0FF6E" }}>
                             <td>TOTAL HISTORICO</td>
-                            <td className="text-end">{parseFloat(totalExpenses).toFixed(2)}</td>
+                            <td className="text-end">{parseFloat(totalExpenses).toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })}</td>
                             <td colSpan={5}></td>
                         </tr>
                     </tfoot>
@@ -175,7 +184,10 @@ function Collects() {
                                 {monthData.collects.map((col) => (
                                     <tr key={col.id}>
                                         <td style={{ width: "1%", whiteSpace: "nowrap" }}>{spanishDate(col.col_date)}</td>
-                                        <td className="text-end" style={{ width: "1%", whiteSpace: "nowrap" }}>{parseFloat(col.col_value).toFixed(2)}</td>
+                                        <td className="text-end" style={{ width: "1%", whiteSpace: "nowrap" }}>{parseFloat(col.col_value).toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })}</td>
                                         <td className="text-center">{col.col_type}</td>
                                         <td className="text-center">{col.col_type == 'OTRO' && col.col_other}</td>
                                         <td className="text-center">{col.observations}</td>
@@ -189,7 +201,10 @@ function Collects() {
                                 ))}
                                 <tr className="fw-bold" style={{ backgroundColor: "#E6F07A" }}>
                                     <td>Total {monthData.month}:</td>
-                                    <td className="text-end">{parseFloat(monthData.total).toFixed(2)}</td>
+                                    <td className="text-end">{parseFloat(monthData.total).toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })}</td>
                                     <td colSpan={5}></td>
                                 </tr>
                             </React.Fragment>
@@ -203,14 +218,20 @@ function Collects() {
                         </tr>
                         <tr className="fw-bold" style={{ backgroundColor: "#F0FF6E" }}>
                             <td>TOTAL HISTORICO</td>
-                            <td className="text-end">{parseFloat(totalCollects).toFixed(2)}</td>
+                            <td className="text-end">{parseFloat(totalCollects).toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })}</td>
                             <td colSpan={5}></td>
                         </tr>
                         <tr>
                             <td colSpan={3} style={{ height: "20px", border: "none" }}></td>
                         </tr>
                         <tr className="fw-bold" style={{ backgroundColor: totalColor }}>
-                            <td colSpan={7} className="text-center">BALANCE HISTORICO (COBROS - GASTOS): {parseFloat(grandTotal).toFixed(2)}</td>
+                            <td colSpan={7} className="text-center">BALANCE HISTORICO (COBROS - GASTOS): {parseFloat(grandTotal).toLocaleString('es-ES', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        })}</td>
                         </tr>
                     </tfoot>
                 )}
