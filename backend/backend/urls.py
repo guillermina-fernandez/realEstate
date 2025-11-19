@@ -17,9 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from api.api_helper import fetch_objects, fetch_object, create_object, update_object, delete_object, fetch_related, fetch_balance, process_agenda
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from api.api_helper import login_view
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/login/', login_view, name='login'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/create/<str:model_name>/<str:depth>/', create_object),
     path('api/update/<str:model_name>/<str:obj_id>/<str:depth>/', update_object),
     path('api/delete/<str:model_name>/<str:obj_id>/', delete_object),

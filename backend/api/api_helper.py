@@ -5,6 +5,9 @@ from rest_framework import status
 from django.core.exceptions import ValidationError
 from django.db import transaction, IntegrityError
 from django.db.models import ProtectedError, RestrictedError
+from django.contrib.auth import authenticate
+
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from common.validators import normalize_form_data, format_balance_data
 
@@ -26,6 +29,27 @@ models_dic = {
     'cobro': Collect,
     'agenda': Agenda,
 }
+
+
+@api_view(['POST'])
+def login_view(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+
+    user = authenticate(username=username, password=password)
+
+    if user is not None:
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'username': user.username,
+        }, status=status.HTTP_200_OK)
+    else:
+        return Response(
+            {'error': 'Invalid username or password'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
 
 
 @api_view(('GET', ))
