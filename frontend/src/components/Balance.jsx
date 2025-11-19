@@ -3,10 +3,11 @@ import { useBalanceContext } from "../context/BalanceContext";
 import { spanishDate } from "../myScripts/myMainScript";
 import { useRef } from "react";
 import { FormExpense, FormCollect } from "./CrudForms";
+import Loading from "./Loading";
 
 
 function ModalBalance(props) {
-    const { closeModal, editObj, modalTitle } = useBalanceContext();
+    const { closeModal, editObj, modalTitle, loading } = useBalanceContext();
 
     const formRef = useRef(null);
 
@@ -17,31 +18,34 @@ function ModalBalance(props) {
     }
 
     return (
-        <div className="modal fade show d-block pg-show-modal" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
-            <div className="modal-dialog" role="document">
-                <div className="modal-content px-3 py-3">
-                    <div className="modal-header">
-                        <h4 className="modal-title">{modalTitle}</h4>
-                        <button className="btn-close" type="button" onClick={closeModal}></button>
-                    </div>
-                    <div className="modal-body">
-                        {props.modelName === 'gasto' ?
-                            <FormExpense formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormExpense> :
-                            <FormCollect formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormCollect>}
-                    </div>
-                    <hr />
-                    <div className="hstack w-100 justify-content-between">
-                        <div>
-
+        <>
+            {loading && <Loading/>}
+            <div className="modal fade show d-block pg-show-modal" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
+                <div className="modal-dialog" role="document">
+                    <div className="modal-content px-3 py-3">
+                        <div className="modal-header">
+                            <h4 className="modal-title">{modalTitle}</h4>
+                            <button className="btn-close" type="button" onClick={closeModal}></button>
                         </div>
-                        <div className="hstack gap-3">
-                            <button className="btn btn-default" type="button" onClick={closeModal}>Cancelar</button>
-                            <button className="btn btn-primary" onClick={handleClick}>Guardar</button>
+                        <div className="modal-body">
+                            {props.modelName === 'gasto' ?
+                                <FormExpense formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormExpense> :
+                                <FormCollect formRef={formRef} initialData={editObj} obj_id={props.obj_id}></FormCollect>}
+                        </div>
+                        <hr />
+                        <div className="hstack w-100 justify-content-between">
+                            <div>
+
+                            </div>
+                            <div className="hstack gap-3">
+                                <button className="btn btn-default" type="button" onClick={closeModal}>Cancelar</button>
+                                <button className="btn btn-primary" onClick={handleClick}>Guardar</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 

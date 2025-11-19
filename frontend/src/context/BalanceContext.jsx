@@ -56,9 +56,9 @@ export const BalanceProvider = ({ reId, children }) => {
         if (error) alert(error);
     }, [error]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         console.log(loading ? 'Show loading.gif' : 'Hide loading.gif');
-    }, [loading]);
+    }, [loading]);*/
 
     const openModal = (modelName, action) => {
         const noun = modelName === 'gasto' ? 'Gasto' : 'Cobro';
@@ -120,6 +120,7 @@ export const BalanceProvider = ({ reId, children }) => {
     const value = {
         reId,
         setLoading,
+        loading,
         setError,
         grandTotal,
         expenses,

@@ -4,6 +4,7 @@ import { useDataContext, DataProvider } from "../context/DataContext";
 import { BalanceProvider } from "../context/BalanceContext";
 import { useEffect, useState } from "react";
 import { Expenses, Collects } from "../components/Balance";
+import Loading from "../components/Loading";
 
 
 function get_persons(personsString) {
@@ -273,7 +274,7 @@ function Rent({ obj_id }) {
 
 
 function RealEstate() {
-    const { modelData } = useDataContext();
+    const { modelData, loading } = useDataContext();
     const [reName, setReName] = useState('')
     const [reId, setReId] = useState(null);
 
@@ -287,6 +288,7 @@ function RealEstate() {
     return (
         <>
             <div>
+                {loading && <Loading />}
                 <h1>{reName}</h1>
                 <div className="w-100 mt-5">
                     <div className="hstack w-100">

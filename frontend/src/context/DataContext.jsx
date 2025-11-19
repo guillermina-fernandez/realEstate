@@ -113,13 +113,13 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
     }, [error]);
 
     // Render loading .gif or something
-    useEffect(() => {
+    /*useEffect(() => {
         if (loading) {
             console.log('Show loading.gif');
         } else {
             console.log('Hide loading.gif');
         }
-    }, [loading])
+    }, [loading])*/
 
     // Search object:
     useEffect(() => {
@@ -270,6 +270,7 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
         modelData,
         modelConfig,
         setLoading,
+        loading,
         setError,
         showModal, 
         openModal,
