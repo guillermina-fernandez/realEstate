@@ -4,7 +4,7 @@ import { toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css";
 
 
-function Login({ setLogged, setIsLoading }) {
+function Login() {
     const [passType, setPassType] = useState('password');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -15,31 +15,37 @@ function Login({ setLogged, setIsLoading }) {
     }
 
     const handleLogin = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    const res = await fetch("http://127.0.0.1:8000/api/login/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-    });
+        const res = await fetch("http://127.0.0.1:8000/api/login/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+        });
 
-    const data = await res.json();
 
-    // 🔐 Step 1 → User never set up OTP → go to QR setup (React page)
-    if (data.setup_required) {
-        navigate("/otp-setup", { state: { userId: data.user_id } });
-        return;
-    }
+        const data = await res.json();
 
-    // 🔐 Step 2 → User HAS OTP → go to OTP verification
-    if (data.otp_required) {
-        navigate("/otp-verify", { state: { userId: data.user_id } });
-        return;
-    }
+        if (!res.ok) {
+            toast.error("Usuario o contraseña incorrectos");
+            return;
+        }
 
-    // If you get here, something’s wrong
-    toast.error("Unexpected login behavior");
-};
+        // 🔐 Step 1 → User never set up OTP → go to QR setup (React page)
+        if (data.setup_required) {
+            navigate("/otp-setup", { state: { userId: data.user_id } });
+            return;
+        }
+
+        // 🔐 Step 2 → User HAS OTP → go to OTP verification
+        if (data.otp_required) {
+            navigate("/otp-verify", { state: { userId: data.user_id } });
+            return;
+        }
+
+        // If you get here, something’s wrong
+        toast.error("Unexpected login behavior");
+    };
 
     return (
         <div className="container-fluid mt-5">

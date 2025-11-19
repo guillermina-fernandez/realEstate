@@ -127,7 +127,7 @@ function App() {
           logged ? (
             <Navigate to='/agenda' replace />
           ) : (
-            <Login setLogged={setLogged} />
+            <Login />
           )
         } />
         <Route path="/otp" element={<OtpPage />} />
