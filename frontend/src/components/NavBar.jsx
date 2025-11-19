@@ -25,22 +25,22 @@ function NavBar({ logged, setLogged }) {
                         <div className="d-flex flex-grow-1 justify-content-evenly">
                             <ul className="navbar-nav">
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/agenda">
+                                    <Link className="nav-link text-white" to="/agenda">
                                         AGENDA
                                     </Link>
                                 </li>
                             </ul>
                             <ul className="navbar-nav">
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/propiedad">
+                                    <Link className="nav-link text-white" to="/propiedad">
                                         PROPIEDADES
                                     </Link>
                                 </li>
                             </ul>
                             <ul className="navbar-nav">
                                 <li className="nav-item dropdown">
-                                    <a className="nav-link dropdown-toggle" href="" id="parametersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">PARÁMETROS</a>
-                                    <ul className="dropdown-menu" aria-labelledby="parametersDropdown">
+                                    <a className="nav-link dropdown-toggle text-white" href="" id="parametersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">PARÁMETROS</a>
+                                    <ul className="dropdown-menu bg-light" aria-labelledby="parametersDropdown">
                                         <li>
                                             <Link className="dropdown-item" to="/propietario">Propietarios</Link>
                                         </li>
