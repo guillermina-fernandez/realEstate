@@ -34,7 +34,11 @@ function Table({ cols }) {
                     {showData.map((dataItem) =>
                         <tr key={dataItem.id} className="text-start">
                             {Object.keys(dataItem).map((key, index) => (
-                                <td key={index} style={{ verticalAlign: "middle" }}>{ dataItem[key] }</td>
+                                <td key={index} style={{ verticalAlign: "middle" }}>
+                                    {typeof dataItem[key] === "object"
+                                        ? JSON.stringify(dataItem[key])
+                                        : dataItem[key]}
+                                </td>
                             ))}
                             <td style={{ width: "10px" }}>
                                 <button className="btn btn-sm btn-danger" type="button" onClick={() => handleDelete(dataItem.id)}><i className="bi bi-trash3"></i></button>

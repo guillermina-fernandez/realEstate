@@ -208,3 +208,43 @@ def fetch_balance(request, re_id):
     }
 
     return Response(result, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def process_agenda(request, agenda_id):
+    try:
+        with transaction.atomic():
+            agenda = Agenda.objects.get(id=int(agenda_id))
+            if agenda.action == 'PAGAR' and agenda.real_estate:
+                expense_type = 'IMPUESTO' if agenda.action_detail == 'IMPUESTO' else 'OTRO'
+                Expense.objects.create(
+                    real_estate=agenda.real_estate,
+                    pay_date=agenda.agenda_date,
+                    pay_value=agenda.agenda_value,
+                    expense_type=expense_type,
+                    tax=agenda.tax,
+                    other_expense=agenda.detail,
+                    observations=agenda.observations
+                )
+            if agenda.action == 'COBRAR' and agenda.real_estate:
+                col_type = 'ALQUILER' if agenda.action_detail == 'ALQUILER' else 'OTRO'
+                Collect.objects.create(
+                    real_estate=agenda.real_estate,
+                    col_date=agenda.agenda_date,
+                    col_value=agenda.agenda_value,
+                    col_type=col_type,
+                    col_other=agenda.detail,
+                    observations=agenda.observations
+                )
+            agenda.delete()
+            return Response({'success': True}, status=status.HTTP_200_OK)
+    except Agenda.DoesNotExist:
+        return Response({'error': f'No se encontró el registro con id {agenda_id}.'}, status=status.HTTP_404_NOT_FOUND)
+    except ValidationError as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    except ProtectedError as e:
+        return Response({'error': f'No se puede eliminar porque está referenciado por otros objetos: {list(e.protected_objects)}'}, status=status.HTTP_400_BAD_REQUEST)
+    except RestrictedError as e:
+        return Response({'error': f'No se puede eliminar debido a restricción de integridad: {list(e.restricted_objects)}'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

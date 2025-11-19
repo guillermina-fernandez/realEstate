@@ -148,3 +148,4 @@ export const fetchBalanceDataAPI = async (reId) => {
     
     return await response.json();
 };
+

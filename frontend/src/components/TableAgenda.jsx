@@ -78,6 +78,40 @@ function TableAgenda() {
         return '';
     }
 
+    function handleProcess(agendaObj) {
+        const agendaId = agendaObj.id;
+        let accepted = null;
+        if (agendaObj.action === 'PAGAR' && agendaObj.real_estate) {
+            accepted = confirm('ATENCIÓN!\nEl pago se registrará como gasto y será eliminado de esta agenda.\nEn caso de no desearlo, cancelar y eliminar manualmente.');
+        } else if (agendaObj.action === 'COBRAR' && agendaObj.real_estate) {
+            accepted = confirm('ATENCIÓN!\nEl cobro se registrará como ingreso y será eliminado de esta agenda.\nEn caso de no desearlo, cancelar y eliminar manualmente.');
+        } else {
+            alert('Opción deshabilitada para este registro. Elimine o Modifique manualmente desde las otras opciones.');
+        }
+        if (accepted) {
+            const processAgenda = async () => {
+                const response = await fetch(`http://127.0.0.1:8000/api/agenda/cod/${agendaId}/`);
+                if (!response.ok) {
+                    let result;
+                    try {
+                        result = await response.json();
+                    } catch {
+                        result = await response.json();
+                    }
+
+                    const message = result?.error ? JSON.stringify(result.error, null, 2) : `Error ${response.status}`;
+                    throw new Error(message);
+                } else {
+                    setShowData(prev =>
+                        prev.filter(item => item !== agendaObj)
+                    );
+                }
+            };
+
+            processAgenda();
+        }
+    }
+
     return (
         <div>
             <table className="custom-table border">
@@ -98,7 +132,7 @@ function TableAgenda() {
                     {showData.map((dataItem) =>
                         <tr key={dataItem.id} className="text-start">
                             <td
-                                className={`fw-bold ${getExpiration(dataItem.agenda_date)}`}
+                                className={`fw-bold ${dataItem?.agenda_date && getExpiration(dataItem.agenda_date)}`}
                                 style={{ width: "1%", whiteSpace: "nowrap" }}
                             >{spanishDate(dataItem.agenda_date)}</td>
                             <td className="fw-bold" style={{ width: "1%", whiteSpace: "nowrap" }}>{dataItem.action !== 'OTRO' && dataItem.action}</td>
@@ -113,7 +147,7 @@ function TableAgenda() {
                                 <button className="btn btn-sm btn-success" type="button" onClick={() => handleEdit(dataItem)}><i className="bi bi-pencil-square"></i></button>
                             </td>
                             <td style={{ width: "10px" }}>
-                                <button className="btn btn-sm" type="button" style={{ backgroundColor: "#91ff00ff" }}><i className="bi bi-check-square"></i></button>
+                                <button className="btn btn-sm" type="button" style={{ backgroundColor: "#91ff00ff" }} onClick={() => handleProcess(dataItem)}><i className="bi bi-check-square"></i></button>
                             </td>
                         </tr>
                     )}

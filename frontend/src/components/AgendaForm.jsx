@@ -281,6 +281,7 @@ function FormAgenda({ formRef, initialData }) {
                         className='form-control form-control-sm'
                         id='agenda_date'
                         name='agenda_date'
+                        defaultValue={new Date().toISOString().split('T')[0]}
                         {...register('agenda_date')}
                         required
                         autoFocus

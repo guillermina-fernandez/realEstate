@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from api.api_helper import fetch_objects, fetch_object, create_object, update_object, delete_object, fetch_related, fetch_balance
+from api.api_helper import fetch_objects, fetch_object, create_object, update_object, delete_object, fetch_related, fetch_balance, process_agenda
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,5 +26,6 @@ urlpatterns = [
     path('api/related/<str:related_model>/<str:related_depth>/<str:related_field>/<str:related_id>/', fetch_related),
     path('api/<str:model_name>/<str:depth>/', fetch_objects),
     path('api/propiedad/<str:re_id>/balance/', fetch_balance),
+    path('api/agenda/cod/<str:agenda_id>/', process_agenda),
     path('api/<str:model_name>/cod/<str:obj_id>/<str:depth>/', fetch_object),
 ]
