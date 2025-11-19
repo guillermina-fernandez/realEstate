@@ -2,7 +2,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError as DjangoValidationError
+from rest_framework.exceptions import ValidationError as DRFValidationError
+
 from django.db import transaction, IntegrityError
 from django.db.models import ProtectedError, RestrictedError
 
@@ -12,6 +14,11 @@ from api.serializers import get_serializer_class, RealEstateCustomSerializer, Ag
 
 from parameters.models import Owner, Tenant, RealEstateType, TaxType
 from realestates.models import RealEstate, Tax, Rent, RentStep, Expense, Collect, Agenda
+
+
+# ---------------------------------------------------------------------------
+# MODEL MAPPING
+# ---------------------------------------------------------------------------
 
 models_dic = {
     'propietario': Owner,
@@ -28,162 +35,222 @@ models_dic = {
 }
 
 
-@api_view(('GET', ))
+# ---------------------------------------------------------------------------
+# SIMPLE ERROR RESPONSE
+# ---------------------------------------------------------------------------
+
+def error(msg, status_code=status.HTTP_400_BAD_REQUEST):
+    """
+    All errors go through this for consistency.
+    Your custom exception handler will format DRFValidationError cases.
+    """
+    return Response({'error': msg}, status=status_code)
+
+
+# ---------------------------------------------------------------------------
+# FETCH OBJECTS
+# ---------------------------------------------------------------------------
+
+@api_view(['GET'])
 def fetch_objects(request, model_name, depth):
+    try:
+        depth = int(depth)
+        model = models_dic[model_name]
+    except Exception:
+        return error("Modelo inválido.")
+
     if model_name == 'propiedad':
-        serializer = RealEstateCustomSerializer(RealEstate.objects.all(), many=True)
+        serializer = RealEstateCustomSerializer(model.objects.all(), many=True)
     elif model_name == 'agenda':
-        serializer = AgendaCustomSerializer(Agenda.objects.all(), many=True)
+        serializer = AgendaCustomSerializer(model.objects.all(), many=True)
     else:
-        serializer_class = get_serializer_class(
-            models_dic[model_name], '__all__', int(depth)
-        )
-        serializer = serializer_class(models_dic[model_name].objects.all(), many=True)
+        serializer_class = get_serializer_class(model, '__all__', depth)
+        serializer = serializer_class(model.objects.all(), many=True)
 
     return Response(serializer.data)
 
 
-@api_view(('GET', ))
+# ---------------------------------------------------------------------------
+# FETCH RELATED
+# ---------------------------------------------------------------------------
+
+@api_view(['GET'])
 def fetch_related(request, related_model, related_depth, related_field, related_id):
-    serializer_class = get_serializer_class(
-        models_dic[related_model], '__all__', int(related_depth)
-    )
-    filter_kwargs = {f"{related_field}_id": int(related_id)}
-    query_set = models_dic[related_model].objects.filter(**filter_kwargs)
-    serializer = serializer_class(query_set, many=True)
+    try:
+        model = models_dic[related_model]
+        related_depth = int(related_depth)
+        filter_kwargs = {f"{related_field}_id": int(related_id)}
+    except Exception:
+        return error("Parámetros inválidos.")
 
-    return Response(serializer.data)
+    queryset = model.objects.filter(**filter_kwargs)
+    serializer_class = get_serializer_class(model, '__all__', related_depth)
+    return Response(serializer_class(queryset, many=True).data)
 
 
-@api_view(('GET', ))
+# ---------------------------------------------------------------------------
+# FETCH SINGLE OBJECT
+# ---------------------------------------------------------------------------
+
+@api_view(['GET'])
 def fetch_object(request, model_name, obj_id, depth):
     if not model_name:
-        return Response({'error': 'No se ha determinado un modelo.'}, status=status.HTTP_400_BAD_REQUEST)
+        return error("No se ha determinado un modelo.")
     if not obj_id:
-        return Response({'error': 'No se ha determinado un id.'}, status=status.HTTP_400_BAD_REQUEST)
+        return error("No se ha determinado un ID.")
 
     try:
-        obj = models_dic[model_name].objects.get(id=int(obj_id))
-        if model_name == 'propiedad':
-            serializer = RealEstateCustomSerializer(instance=obj)
-        else:
-            serializer_class = get_serializer_class(
-                models_dic[model_name], '__all__', int(depth)
-            )
-            serializer = serializer_class(instance=obj)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except ValidationError as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except models_dic[model_name].DoesNotExist:
-        return Response({'error': f'No se encontró el objeto del modelo {model_name} con id {obj_id}.'}, status=status.HTTP_404_NOT_FOUND)
-    except LookupError:
-        return Response({'error': f'Nombre de modelo inválido ({model_name}).'}, status=status.HTTP_400_BAD_REQUEST)
+        depth = int(depth)
+        model = models_dic[model_name]
+        instance = model.objects.get(id=int(obj_id))
+    except model.DoesNotExist:
+        return error(f"No se encontró {model_name} con ID {obj_id}.", status.HTTP_404_NOT_FOUND)
+    except Exception:
+        return error("Parámetros inválidos.")
+
+    if model_name == 'propiedad':
+        serializer = RealEstateCustomSerializer(instance)
+    else:
+        serializer_class = get_serializer_class(model, '__all__', depth)
+        serializer = serializer_class(instance)
+
+    return Response(serializer.data)
 
 
-@api_view(('POST', ))
+# ---------------------------------------------------------------------------
+# CREATE OBJECT
+# ---------------------------------------------------------------------------
+
+@api_view(['POST'])
 def create_object(request, model_name, depth):
-    form_data = request.data
-    if not form_data:
-        return Response({'error': 'No se ha enviado la información.'}, status=status.HTTP_400_BAD_REQUEST)
+    if not request.data:
+        return error("No se ha enviado la información.")
     if not model_name:
-        return Response({'error': 'No se ha determinado un modelo.'}, status=status.HTTP_400_BAD_REQUEST)
+        return error("No se ha determinado un modelo.")
 
-    form_data = normalize_form_data(models_dic[model_name], form_data)
-    serializer_class = get_serializer_class(models_dic[model_name], '__all__', 0)
+    try:
+        model = models_dic[model_name]
+        depth = int(depth)
+    except Exception:
+        return error("Modelo inválido.")
+
+    form_data = normalize_form_data(model, request.data)
+    serializer_class = get_serializer_class(model, '__all__', 0)
     serializer = serializer_class(data=form_data)
 
-    if serializer.is_valid():
-        try:
-            instance = serializer.save()
-            if model_name == 'propiedad':
-                serializer = RealEstateCustomSerializer(instance=instance)
-            elif model_name == 'agenda':
-                serializer = AgendaCustomSerializer(instance=instance)
-            else:
-                serializer_class = get_serializer_class(models_dic[model_name], '__all__', int(depth))
-                serializer = serializer_class(instance=instance)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ValidationError as e:
-            return Response({'error': {'__all__': [str(e)]}}, status=status.HTTP_400_BAD_REQUEST)
-        except IntegrityError as e:
-            return Response({'error': {'__all__': [str(e)]}}, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    # DRF handles validation cleanly
+    serializer.is_valid(raise_exception=True)
 
+    try:
+        with transaction.atomic():
+            instance = serializer.save()
+    except DjangoValidationError as e:
+        # Convert Django ValidationError → DRFValidationError
+        raise DRFValidationError(e.message_dict)
+    except IntegrityError as e:
+        raise DRFValidationError(str(e))
+
+    # Output serializer
+    if model_name == 'propiedad':
+        serializer = RealEstateCustomSerializer(instance)
+    elif model_name == 'agenda':
+        serializer = AgendaCustomSerializer(instance)
+    else:
+        read_serializer = get_serializer_class(model, '__all__', depth)
+        serializer = read_serializer(instance)
+
+    return Response(serializer.data)
+
+
+# ---------------------------------------------------------------------------
+# UPDATE OBJECT
+# ---------------------------------------------------------------------------
 
 @api_view(['PUT'])
 def update_object(request, model_name, obj_id, depth):
-    form_data = request.data
-
-    if not form_data:
-        return Response({'error': 'No se ha enviado la información.'}, status=status.HTTP_400_BAD_REQUEST)
-
+    if not request.data:
+        return error("No se ha enviado la información.")
     if not model_name:
-        return Response({'error': 'No se ha determinado un modelo.'}, status=status.HTTP_400_BAD_REQUEST)
+        return error("No se ha determinado un modelo.")
     if not obj_id:
-        return Response({'error': 'No se ha determinado un id.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    form_data = normalize_form_data(models_dic[model_name], form_data)
-
-    serializer_class = get_serializer_class(models_dic[model_name], '__all__', 0)
+        return error("No se ha determinado un ID.")
 
     try:
-        object_instance = models_dic[model_name].objects.get(id=int(obj_id))
-    except ValidationError as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except models_dic[model_name].DoesNotExist:
-        return Response({'error': f'No se encontró el objeto del modelo {model_name} con id {obj_id}.'}, status=status.HTTP_404_NOT_FOUND)
-    except LookupError:
-        return Response({'error': f'Nombre de modelo inválido ({model_name}).'}, status=status.HTTP_400_BAD_REQUEST)
+        model = models_dic[model_name]
+        depth = int(depth)
+        instance = model.objects.get(id=int(obj_id))
+    except model.DoesNotExist:
+        return error(f"No se encontró {model_name} con ID {obj_id}.", status.HTTP_404_NOT_FOUND)
+    except Exception:
+        return error("Parámetros inválidos.")
 
-    serializer = serializer_class(instance=object_instance, data=form_data)
-    if serializer.is_valid():
-        try:
+    form_data = normalize_form_data(model, request.data)
+    serializer_class = get_serializer_class(model, '__all__', 0)
+    serializer = serializer_class(instance=instance, data=form_data)
+
+    serializer.is_valid(raise_exception=True)
+
+    try:
+        with transaction.atomic():
             instance = serializer.save()
-            if model_name == 'propiedad':
-                serializer = RealEstateCustomSerializer(instance=instance)
-            elif model_name == 'agenda':
-                serializer = AgendaCustomSerializer(instance=instance)
-            else:
-                serializer_class = get_serializer_class(models_dic[model_name], '__all__', int(depth))
-                serializer = serializer_class(instance=instance)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ValidationError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except DjangoValidationError as e:
+        raise DRFValidationError(e.message_dict)
+    except IntegrityError as e:
+        raise DRFValidationError(str(e))
 
+    # Output serializer
+    if model_name == 'propiedad':
+        serializer = RealEstateCustomSerializer(instance)
+    elif model_name == 'agenda':
+        serializer = AgendaCustomSerializer(instance)
+    else:
+        read_serializer_class = get_serializer_class(model, '__all__', depth)
+        serializer = read_serializer_class(instance)
+
+    return Response(serializer.data)
+
+
+# ---------------------------------------------------------------------------
+# DELETE OBJECT
+# ---------------------------------------------------------------------------
 
 @api_view(['DELETE'])
 def delete_object(request, model_name, obj_id):
     if not model_name:
-        return Response({'error': 'No se ha determinado un modelo.'}, status=status.HTTP_400_BAD_REQUEST)
+        return error("No se ha determinado un modelo.")
     if not obj_id:
-        return Response({'error': 'No se ha determinado un id.'}, status=status.HTTP_400_BAD_REQUEST)
+        return error("No se ha determinado un ID.")
+
+    try:
+        model = models_dic[model_name]
+        instance = model.objects.get(id=int(obj_id))
+    except model.DoesNotExist:
+        return error(f"No se encontró {model_name} con ID {obj_id}.", status.HTTP_404_NOT_FOUND)
+    except Exception:
+        return error("Parámetros inválidos.")
 
     try:
         with transaction.atomic():
-            obj = models_dic[model_name].objects.get(id=int(obj_id))
-            obj.delete()
-            return Response({'success': True}, status=status.HTTP_200_OK)
-    except ValidationError as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except models_dic[model_name].DoesNotExist:
-        return Response({'error': f'No se encontró el objeto del modelo {model_name} con id {obj_id}.'}, status=status.HTTP_404_NOT_FOUND)
-    except ProtectedError as e:
-        return Response({'error': f'No se puede eliminar porque está referenciado por otros objetos: {list(e.protected_objects)}'}, status=status.HTTP_400_BAD_REQUEST)
-    except RestrictedError as e:
-        return Response({'error': f'No se puede eliminar debido a restricción de integridad: {list(e.restricted_objects)}'}, status=status.HTTP_400_BAD_REQUEST)
-    except LookupError:
-        return Response({'error': f'Nombre de modelo inválido ({model_name}).'}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            instance.delete()
+    except ProtectedError:
+        return error("No se puede eliminar porque está referenciado por otros objetos.")
+    except RestrictedError:
+        return error("No se puede eliminar por restricciones de integridad.")
 
+    return Response({'success': True})
+
+
+# ---------------------------------------------------------------------------
+# BALANCE
+# ---------------------------------------------------------------------------
 
 @api_view(['GET'])
 def fetch_balance(request, re_id):
+    try:
+        re_id = int(re_id)
+    except Exception:
+        return error("ID inválido.")
+
     expenses_data = format_balance_data(
         model=Expense,
         re_id=re_id,
@@ -201,50 +268,55 @@ def fetch_balance(request, re_id):
         value_field='col_value',
     )
 
-    result = {
+    return Response({
         "expenses": expenses_data,
         "collects": collects_data,
         "balance": collects_data["grand_total"] - expenses_data["grand_total"]
-    }
+    })
 
-    return Response(result, status=status.HTTP_200_OK)
 
+# ---------------------------------------------------------------------------
+# PROCESS AGENDA
+# ---------------------------------------------------------------------------
 
 @api_view(['GET'])
 def process_agenda(request, agenda_id):
     try:
+        agenda = Agenda.objects.get(id=int(agenda_id))
+    except Agenda.DoesNotExist:
+        return error(f"No se encontró la agenda con ID {agenda_id}.", status.HTTP_404_NOT_FOUND)
+    except Exception:
+        return error("ID inválido.")
+
+    try:
         with transaction.atomic():
-            agenda = Agenda.objects.get(id=int(agenda_id))
+
             if agenda.action == 'PAGAR' and agenda.real_estate:
-                expense_type = 'IMPUESTO' if agenda.action_detail == 'IMPUESTO' else 'OTRO'
                 Expense.objects.create(
                     real_estate=agenda.real_estate,
                     pay_date=agenda.agenda_date,
                     pay_value=agenda.agenda_value,
-                    expense_type=expense_type,
+                    expense_type='IMPUESTO' if agenda.action_detail == 'IMPUESTO' else 'OTRO',
                     tax=agenda.tax,
                     other_expense=agenda.detail,
                     observations=agenda.observations
                 )
+
             if agenda.action == 'COBRAR' and agenda.real_estate:
-                col_type = 'ALQUILER' if agenda.action_detail == 'ALQUILER' else 'OTRO'
                 Collect.objects.create(
                     real_estate=agenda.real_estate,
                     col_date=agenda.agenda_date,
                     col_value=agenda.agenda_value,
-                    col_type=col_type,
+                    col_type='ALQUILER' if agenda.action_detail == 'ALQUILER' else 'OTRO',
                     col_other=agenda.detail,
                     observations=agenda.observations
                 )
+
             agenda.delete()
-            return Response({'success': True}, status=status.HTTP_200_OK)
-    except Agenda.DoesNotExist:
-        return Response({'error': f'No se encontró el registro con id {agenda_id}.'}, status=status.HTTP_404_NOT_FOUND)
-    except ValidationError as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    except ProtectedError as e:
-        return Response({'error': f'No se puede eliminar porque está referenciado por otros objetos: {list(e.protected_objects)}'}, status=status.HTTP_400_BAD_REQUEST)
-    except RestrictedError as e:
-        return Response({'error': f'No se puede eliminar debido a restricción de integridad: {list(e.restricted_objects)}'}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    except ProtectedError:
+        return error("No se puede procesar porque otros objetos lo referencian.")
+    except RestrictedError:
+        return error("No se puede procesar por restricciones de integridad.")
+
+    return Response({'success': True})

@@ -6,16 +6,16 @@ from parameters.models import RealEstateType, Owner, TaxType, Tenant
 
 
 class RealEstate(models.Model):
-    address = models.CharField(max_length=50)
-    floor = models.IntegerField(blank=True, null=True)
-    unit = models.IntegerField(blank=True, null=True)
+    address = models.CharField(max_length=50, verbose_name="Dirección")
+    floor = models.IntegerField(blank=True, null=True, verbose_name="Piso")
+    unit = models.IntegerField(blank=True, null=True, verbose_name="Unidad")
     re_type = models.ForeignKey(RealEstateType, related_name='re_re_type', on_delete=models.RESTRICT)
     has_garage = models.CharField(max_length=2, default='NO')
-    owner = models.ManyToManyField(Owner, related_name='re_owner', blank=True)
-    usufruct = models.ManyToManyField(Owner, related_name='re_usufruct', blank=True)
-    buy_date = models.DateField(blank=True, null=True)
-    buy_value = models.CharField(max_length=100, blank=True, null=True)
-    observations = models.CharField(max_length=500, blank=True, null=True)
+    owner = models.ManyToManyField(Owner, related_name='re_owner', blank=True, verbose_name="Propietario")
+    usufruct = models.ManyToManyField(Owner, related_name='re_usufruct', blank=True, verbose_name="Usufructo")
+    buy_date = models.DateField(blank=True, null=True, verbose_name="Fecha de compra")
+    buy_value = models.CharField(max_length=100, blank=True, null=True, verbose_name="Valor de compra")
+    observations = models.CharField(max_length=500, blank=True, null=True, verbose_name="Observaciones")
 
     @property
     def re_name(self):
@@ -29,16 +29,18 @@ class RealEstate(models.Model):
     class Meta:
         unique_together = ('address', 'floor', 'unit', )
         ordering = ('address', 'floor', 'unit', )
+        verbose_name = 'Propiedad'
+        verbose_name_plural = 'Propiedades'
 
 
 class Tax(models.Model):
     real_estate = models.ForeignKey(RealEstate, related_name='tax_re', on_delete=models.CASCADE)
     tax_type = models.ForeignKey(TaxType, related_name='tax_tax_type', on_delete=models.RESTRICT)
-    tax_other = models.CharField(max_length=50, blank=True, null=True)
-    tax_nbr1 = models.CharField(max_length=50)
-    tax_nbr2 = models.CharField(max_length=50, blank=True, null=True)
-    taxed_person = models.CharField(max_length=60, blank=True, null=True)
-    observations = models.CharField(max_length=500, blank=True, null=True)
+    tax_other = models.CharField(max_length=50, blank=True, null=True, verbose_name="Otro impuesto")
+    tax_nbr1 = models.CharField(max_length=50, verbose_name="Número de impuesto")
+    tax_nbr2 = models.CharField(max_length=50, blank=True, null=True, verbose_name="Número de impuesto secundario")
+    taxed_person = models.CharField(max_length=60, blank=True, null=True, verbose_name="Titular del impuesto")
+    observations = models.CharField(max_length=500, blank=True, null=True, verbose_name="Observaciones")
 
     def clean(self):
         if self.tax_type_id:
@@ -53,16 +55,18 @@ class Tax(models.Model):
     class Meta:
         unique_together = ('tax_type', 'tax_nbr1', 'tax_nbr2', )
         ordering = ('tax_type', 'tax_other', 'tax_nbr1', 'tax_nbr2', )
+        verbose_name = 'Impuesto'
+        verbose_name_plural = 'Impuestos'
 
 
 class Rent(models.Model):
     real_estate = models.ForeignKey(RealEstate, related_name='rent_re', on_delete=models.CASCADE)
-    date_from = models.DateField()
-    date_to = models.DateField()
-    actualization = models.CharField(max_length=100)
+    date_from = models.DateField(verbose_name="Fecha desde")
+    date_to = models.DateField(verbose_name="Fecha hasta")
+    actualization = models.CharField(max_length=100, verbose_name="Actualización")
     tenant = models.ManyToManyField(Tenant, related_name='rent_tenant')
-    administrator = models.CharField(max_length=100, blank=True, null=True)
-    observations = models.CharField(max_length=500, blank=True, null=True)
+    administrator = models.CharField(max_length=100, blank=True, null=True, verbose_name="Administrador")
+    observations = models.CharField(max_length=500, blank=True, null=True, verbose_name="Observaciones")
 
     @property
     def tenants(self):
@@ -88,14 +92,16 @@ class Rent(models.Model):
 
     class Meta:
         ordering = ('-date_to', )
+        verbose_name = 'Alquiler'
+        verbose_name_plural = 'Alquileres'
 
 
 class RentStep(models.Model):
     rent = models.ForeignKey(Rent, related_name='step_rent', on_delete=models.CASCADE)
-    date_from = models.DateField()
-    date_to = models.DateField()
-    rent_value = models.FloatField(blank=True, null=True)
-    observations = models.CharField(max_length=500, blank=True, null=True)
+    date_from = models.DateField(verbose_name="Fecha desde")
+    date_to = models.DateField(verbose_name="Fecha hasta")
+    rent_value = models.FloatField(blank=True, null=True, verbose_name="Valor")
+    observations = models.CharField(max_length=500, blank=True, null=True, verbose_name="Observaciones")
 
     def clean(self):
         if self.date_from > self.date_to:
@@ -120,15 +126,19 @@ class RentStep(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
+    class Meta:
+        verbose_name = 'Escalón'
+        verbose_name_plural = 'Escalones'
+
 
 class Expense(models.Model):
     real_estate = models.ForeignKey(RealEstate, related_name='expense_re', on_delete=models.CASCADE)
-    pay_date = models.DateField()
-    pay_value = models.FloatField()
-    expense_type = models.CharField(max_length=10)
+    pay_date = models.DateField(verbose_name="Fecha de gasto")
+    pay_value = models.FloatField(verbose_name="Importe")
+    expense_type = models.CharField(max_length=10, verbose_name="Tipo de gasto")
     tax = models.ForeignKey(Tax, related_name='expense_tax', on_delete=models.RESTRICT, blank=True, null=True)
-    other_expense = models.CharField(max_length=200, blank=True, null=True)
-    observations = models.CharField(max_length=500, blank=True, null=True)
+    other_expense = models.CharField(max_length=200, blank=True, null=True, verbose_name="Otro gasto")
+    observations = models.CharField(max_length=500, blank=True, null=True, verbose_name="Observaciones")
 
     def clean(self):
         if self.expense_type == 'IMPUESTO' and not self.tax:
@@ -142,15 +152,17 @@ class Expense(models.Model):
 
     class Meta:
         ordering = ('-pay_date', )
+        verbose_name = 'Gasto'
+        verbose_name_plural = 'Gastos'
 
 
 class Collect(models.Model):
     real_estate = models.ForeignKey(RealEstate, related_name='collect_re', on_delete=models.CASCADE)
-    col_date = models.DateField()
-    col_value = models.FloatField()
-    col_type = models.CharField(max_length=10)
-    col_other = models.CharField(max_length=200, blank=True, null=True)
-    observations = models.CharField(max_length=500, blank=True, null=True)
+    col_date = models.DateField(verbose_name="Fecha de cobro")
+    col_value = models.FloatField(verbose_name="Importe")
+    col_type = models.CharField(max_length=10, verbose_name="Tipo de cobro")
+    col_other = models.CharField(max_length=200, blank=True, null=True, verbose_name="Otro cobro")
+    observations = models.CharField(max_length=500, blank=True, null=True, verbose_name="Observaciones")
 
     def clean(self):
         if self.col_type == 'OTRO' and not self.col_other:
@@ -162,17 +174,19 @@ class Collect(models.Model):
 
     class Meta:
         ordering = ('-col_date', )
+        verbose_name = 'Ingreso'
+        verbose_name_plural = 'Ingresos'
 
 
 class Agenda(models.Model):
     real_estate = models.ForeignKey(RealEstate, related_name='agenda_re', on_delete=models.CASCADE, blank=True, null=True)
-    agenda_date = models.DateField()
-    agenda_value = models.FloatField(blank=True, null=True)
-    action = models.CharField(max_length=6)  # PAGAR/COBRAR/OTRO
-    action_detail = models.CharField(max_length=8)  # IMPUESTO/ALQUILER/OTRO
-    detail = models.CharField(max_length=500, blank=True, null=True)
+    agenda_date = models.DateField(verbose_name="Fecha")
+    agenda_value = models.FloatField(blank=True, null=True, verbose_name="Importe")
+    action = models.CharField(max_length=6, verbose_name="Acción")  # PAGAR/COBRAR/OTRO
+    action_detail = models.CharField(max_length=8, verbose_name="Detalle (acción)")  # IMPUESTO/ALQUILER/OTRO
+    detail = models.CharField(max_length=500, blank=True, null=True, verbose_name="Detalle")
     tax = models.ForeignKey(Tax, related_name='agenda_tax', on_delete=models.RESTRICT, blank=True, null=True)
-    observations = models.CharField(max_length=500, blank=True, null=True)
+    observations = models.CharField(max_length=500, blank=True, null=True, verbose_name="Observaciones")
 
     @property
     def re_name(self):
@@ -195,3 +209,5 @@ class Agenda(models.Model):
 
     class Meta:
         ordering = ['agenda_date']
+        verbose_name = 'Agenda'
+        verbose_name_plural = 'Agendas'
