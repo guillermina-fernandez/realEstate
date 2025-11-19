@@ -8,6 +8,9 @@ import NavBar from './components/NavBar'
 import Agenda from './pages/Agenda'
 import Login from './pages/Login';
 import { ToastContainer } from 'react-toastify';
+import OtpPage from './pages/OtpPage'
+import OtpSetup from './pages/OtpPage'
+import OtpVerify from './pages/OtpVerify'
 
 
 function isTokenExpired(token) {
@@ -127,6 +130,9 @@ function App() {
             <Login setLogged={setLogged} />
           )
         } />
+        <Route path="/otp" element={<OtpPage />} />
+        <Route path="/otp-setup" element={<OtpSetup />} />
+        <Route path="/otp-verify" element={<OtpVerify />} />
         {crudRoutes.map(({ path, modelName, modelDepth, modelId, relatedModel, relatedModelDepth, relatedFieldName }) => (
           <Route key={modelName} path={path} element={
             <PrivateRoute logged={logged}>

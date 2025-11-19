@@ -15,29 +15,31 @@ function Login({ setLogged, setIsLoading }) {
     }
 
     const handleLogin = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await fetch('http://127.0.0.1:8000/api/login/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-            });
+    e.preventDefault();
 
-            if (!res.ok) {
-                const errorData = await res.json();
-                toast.error(errorData.error || "Usuario o Contraseña incorrectos.");
-                return;
-            }
+    const res = await fetch("http://127.0.0.1:8000/api/login/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+    });
 
-            const data = await res.json();
-            localStorage.setItem("access", data.access);
-            localStorage.setItem("refresh", data.refresh);
-            setLogged(true);
-            navigate("/home");
-        } catch (error) {
-            toast.error('Error de Conexión.');
-        }
-    };
+    const data = await res.json();
+
+    // 🔐 Step 1 → User never set up OTP → go to QR setup (React page)
+    if (data.setup_required) {
+        navigate("/otp-setup", { state: { userId: data.user_id } });
+        return;
+    }
+
+    // 🔐 Step 2 → User HAS OTP → go to OTP verification
+    if (data.otp_required) {
+        navigate("/otp-verify", { state: { userId: data.user_id } });
+        return;
+    }
+
+    // If you get here, something’s wrong
+    toast.error("Unexpected login behavior");
+};
 
     return (
         <div className="container-fluid mt-5">

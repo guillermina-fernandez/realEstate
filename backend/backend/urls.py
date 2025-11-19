@@ -15,13 +15,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from api.api_helper import fetch_objects, fetch_object, create_object, update_object, delete_object, fetch_related, fetch_balance, process_agenda
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from api.api_helper import login_view
+from api.api_login import login_view, otp_verify
+from api.opt_setup import otp_setup, otp_activate
+from two_factor import urls as tf_urls
 
 
 urlpatterns = [
+    # path("", include((tf_urls.urlpatterns[0], "two_factor"), namespace="two_factor")),
+    # path('api/login/', login_view, name='login'),
+    # path('api/otp/verify/', verify_otp, name='verify_otp'),
+    path("api/login/", login_view),
+    path("api/otp/setup/", otp_setup),
+    path("api/otp/activate/", otp_activate),
+    path("api/otp/verify/", otp_verify),
     path('admin/', admin.site.urls),
     path('api/login/', login_view, name='login'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
