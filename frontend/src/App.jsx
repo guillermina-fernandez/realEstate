@@ -119,9 +119,18 @@ function App() {
     };
   }, []);
 
+  function NotFound() {
+    return (
+      <div className="p-8 text-center">
+        <h1 className="text-4xl font-bold">404</h1>
+        <p className="text-lg mt-4">Página no encontrada</p>
+      </div>
+    );
+  }
+
   return (
     <main>
-      <NavBar logged={logged} setLogged={setLogged}/>
+      <NavBar logged={logged} setLogged={setLogged} />
       <Routes>
         <Route path='/' element={
           logged ? (
@@ -130,6 +139,7 @@ function App() {
             <Login />
           )
         } />
+        <Route path="*" element={<NotFound />} />
         <Route path="/otp" element={<OtpPage />} />
         <Route path="/otp-setup" element={<OtpSetup />} />
         <Route path="/otp-verify" element={<OtpVerify />} />

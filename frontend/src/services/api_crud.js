@@ -48,7 +48,9 @@ export const fetchObjDataAPI = async (modelName, objId, modelDepth) => {
         } catch {
             
         }
-        throw new Error(message);
+        const error = new Error(message);
+        error.status = response.status;
+        throw error;
     }
     
     return await response.json();

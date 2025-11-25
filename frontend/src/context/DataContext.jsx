@@ -110,7 +110,7 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
     useEffect(() => {
         if (!error) return;
 
-        let message = error;
+        let message = null;
 
         // If error is an Error object
         if (error instanceof Error) {
@@ -128,6 +128,10 @@ export const DataProvider = ({ modelName, modelDepth, modelId, relatedModel, rel
         }
 
         toast.error(message);
+
+        if (error.status === 404 || error.status === 400) {
+            navigate('/')
+        }
     }, [error]);
 
     // Render loading .gif or something
