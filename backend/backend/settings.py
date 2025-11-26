@@ -200,7 +200,6 @@ else:
     CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
 
 if ENV == "production":
-
     # HTTPS redirection
     SECURE_SSL_REDIRECT = True
 
@@ -211,6 +210,13 @@ if ENV == "production":
     # Prevent JavaScript cookie access
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
+
+    # ✅ ADD THESE LINES - Critical for cross-origin session cookies
+    SESSION_COOKIE_SAMESITE = 'None'  # Allow cross-origin
+    CSRF_COOKIE_SAMESITE = 'None'  # Allow cross-origin
+
+    # ✅ ADD THIS - Specify the cookie domain
+    SESSION_COOKIE_DOMAIN = os.getenv('SESSION_COOKIE_DOMAIN')
 
     # HSTS - strict HTTPS
     SECURE_HSTS_SECONDS = 31536000
