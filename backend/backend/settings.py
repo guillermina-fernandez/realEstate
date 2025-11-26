@@ -32,9 +32,6 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 if ENV == "production":
     DEBUG = False
     ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-    CSRF_TRUSTED_ORIGINS = [
-        # FILL <----------
-    ]
 else:
     DEBUG = True
     ALLOWED_HOSTS = ["*"]
