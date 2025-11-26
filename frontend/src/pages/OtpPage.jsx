@@ -13,7 +13,7 @@ export default function OtpSetup() {
     useEffect(() => {
         fetch(`${API_URL}/api/otp/setup/`, {
             method: "POST",
-            credentials: "include", // send cookies!
+            credentials: "include",
         })
         .then(res => res.json())
         .then(data => setQr(data.qr_image));
@@ -27,9 +27,16 @@ export default function OtpSetup() {
             body: JSON.stringify({ token }),
         });
 
+        // ✅ CHANGED THIS SECTION
         if (res.ok) {
+            const data = await res.json();  // ✅ Parse response
+
+            // ✅ Store JWT tokens
+            localStorage.setItem("access", data.access);
+            localStorage.setItem("refresh", data.refresh);
+
             alert("OTP activated!");
-            window.location.href = "/"; // back to login, or dashboard
+            window.location.href = "/agenda";  // ✅ Changed from "/" to "/agenda"
         } else {
             alert("Invalid code");
         }

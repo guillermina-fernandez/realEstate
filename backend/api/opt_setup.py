@@ -99,4 +99,13 @@ def otp_activate(request):
     # Reset fail counter
     _reset_fail_count(user.id)
 
-    return Response({"success": True})
+    # ✅ ADD THESE LINES - Create JWT tokens after successful activation
+    from rest_framework_simplejwt.tokens import RefreshToken
+
+    refresh = RefreshToken.for_user(user)
+
+    return Response({
+        "success": True,
+        "access": str(refresh.access_token),
+        "refresh": str(refresh)
+    })
