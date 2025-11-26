@@ -16,11 +16,11 @@ import os
 from datetime import timedelta
 
 
-load_dotenv()
-ENV = os.getenv('DJANGO_ENV', 'development')
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
+ENV = os.getenv('DJANGO_ENV', 'development')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
