@@ -15,11 +15,12 @@ from dotenv import load_dotenv
 import os
 from datetime import timedelta
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()
 ENV = os.getenv('DJANGO_ENV', 'development')
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -28,12 +29,17 @@ ENV = os.getenv('DJANGO_ENV', 'development')
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENV == 'production':
+if ENV == "production":
     DEBUG = False
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+    CSRF_TRUSTED_ORIGINS = [
+        # FILL <----------
+    ]
 else:
     DEBUG = True
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = ["*"]
+
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 
 # Application definition
@@ -41,9 +47,9 @@ else:
 INSTALLED_APPS = [
     'corsheaders',
     'django_otp',
-    'django_otp.plugins.otp_totp',  # Time-based tokens
+    'django_otp.plugins.otp_totp',
     'two_factor',
-    'django_otp.plugins.otp_static',  # backup codes
+    'django_otp.plugins.otp_static',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -57,15 +63,15 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django_otp.middleware.OTPMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'django_otp.middleware.OTPMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -93,15 +99,17 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 if ENV == "production":
-    # Example PostgreSQL (recommended)
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
+            "ENGINE": "django.db.backends.mysql",
             "NAME": os.getenv("DB_NAME"),
             "USER": os.getenv("DB_USER"),
             "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
-            "PORT": os.getenv("DB_PORT", "5432"),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "PORT": os.getenv("DB_PORT", "3306"),
+            "OPTIONS": {
+                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
         }
     }
 else:
@@ -152,12 +160,18 @@ DATE_FORMAT = 'd/m/Y'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -181,8 +195,8 @@ if ENV == "development":
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOW_ALL_ORIGINS = False
-    CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
-    CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    CORS_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS
+    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS
 
 if ENV == "production":
 
@@ -207,7 +221,11 @@ if ENV == "production":
     X_FRAME_OPTIONS = "DENY"
     SECURE_REFERRER_POLICY = "same-origin"
 
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 TWO_FACTOR_REQUIRED = True
-LOGIN_REDIRECT_URL = "http://127.0.0.1:5173/agenda"
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = "/agenda/"
 
