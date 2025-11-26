@@ -8,6 +8,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+# dist
+# Need it in PythonAnywhere since it does not have npm to build by itself.
+# Uncomment otherwise
 dist-ssr
 *.local
 
