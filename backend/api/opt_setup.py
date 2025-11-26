@@ -1,12 +1,10 @@
 import base64
 import qrcode
 from io import BytesIO
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.core.cache import cache
-from rest_framework.authentication import SessionAuthentication  # ✅ ADD THIS
 
 OTP_MAX_TRIES = 5  # Number of allowed failed attempts
 OTP_LOCK_MINUTES = 10  # Lockout duration
@@ -34,10 +32,9 @@ def _reset_fail_count(user_id):
     cache.delete(f"otp_lock_{user_id}")
 
 
-# ✅ CHANGE: Remove @permission_classes, manually check authentication
 @api_view(['POST'])
 def otp_setup(request):
-    # ✅ Manual authentication check
+    # Manual authentication check
     if not request.user.is_authenticated:
         return Response({"error": "Unauthorized"}, status=401)
 
@@ -63,17 +60,19 @@ def otp_setup(request):
 
     qr_base64 = base64.b64encode(buffer.getvalue()).decode()
 
+    # Properly encode the secret as base32
+    secret = base64.b32encode(device.bin_key).decode('utf-8')
+
     return Response({
-        "secret": device.bin_key.decode(),
+        "secret": secret,
         "otpauth_url": uri,
         "qr_image": f"data:image/png;base64,{qr_base64}",
     })
 
 
-# ✅ CHANGE: Remove @permission_classes, manually check authentication
 @api_view(['POST'])
 def otp_activate(request):
-    # ✅ Manual authentication check
+    # Manual authentication check
     if not request.user.is_authenticated:
         return Response({"error": "Unauthorized"}, status=401)
 
@@ -118,4 +117,3 @@ def otp_activate(request):
         "access": str(refresh.access_token),
         "refresh": str(refresh)
     })
-
