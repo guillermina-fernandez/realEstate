@@ -15,18 +15,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from api.api_helper import fetch_objects, fetch_object, create_object, update_object, delete_object, fetch_related, fetch_balance, process_agenda
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from api.api_login import login_view, otp_verify
 from api.opt_setup import otp_setup, otp_activate
-from two_factor import urls as tf_urls
+
+from django.urls import re_path
+from backend.views import react_app
 
 
 urlpatterns = [
-    # path("", include((tf_urls.urlpatterns[0], "two_factor"), namespace="two_factor")),
-    # path('api/login/', login_view, name='login'),
-    # path('api/otp/verify/', verify_otp, name='verify_otp'),
     path("api/login/", login_view),
     path("api/otp/setup/", otp_setup),
     path("api/otp/activate/", otp_activate),
@@ -44,3 +43,9 @@ urlpatterns = [
     path('api/agenda/cod/<str:agenda_id>/', process_agenda),
     path('api/<str:model_name>/cod/<str:obj_id>/<str:depth>/', fetch_object),
 ]
+
+
+urlpatterns += [
+    re_path(r"^(?:.*)/?$", react_app),
+]
+
