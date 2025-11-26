@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    # 'django_otp.middleware.OTPMiddleware',
+    'django_otp.middleware.OTPMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -225,7 +225,7 @@ if ENV == "production":
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
-# TWO_FACTOR_REQUIRED = True
+TWO_FACTOR_REQUIRED = True
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = "/agenda/"
