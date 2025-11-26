@@ -1,15 +1,15 @@
-from django.views.generic import TemplateView
-from django.shortcuts import render
+from django.http import FileResponse, Http404
 import os
 
 
 def react_app(request):
     index_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        '..',
-        'frontend',
-        'dist',
+        '/home/ADMProp/realEstate/frontend/dist',
         'index.html'
     )
 
-    return render(request, index_path)
+    if not os.path.exists(index_path):
+        raise Http404("React build not found")
+
+    return FileResponse(open(index_path, 'rb'))
+
