@@ -39,9 +39,6 @@ else:
     DEBUG = True
     ALLOWED_HOSTS = ["*"]
 
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -160,8 +157,17 @@ DATE_FORMAT = 'd/m/Y'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-# STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+
+# Where PythonAnywhere will store collected static files (Django admin, etc)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# This is for additional static files in development.
+# Your project's static/ folder should exist.
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'frontend', 'dist'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

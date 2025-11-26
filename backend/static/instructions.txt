@@ -1,0 +1,15 @@
+Added to be recognized by git
+
+In settings.py configuration should be:
+
+STATIC_URL = '/static/'
+
+# Where PythonAnywhere will store collected static files (Django admin, etc)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# This is for additional static files in development.
+# Your project's static/ folder should exist.
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'frontend', 'dist'),
+]
