@@ -107,6 +107,10 @@ def otp_activate(request):
     # Reset fail counter
     _reset_fail_count(user.id)
 
+    # ✅ Mark the user as OTP-verified in the session
+    from django_otp import login as otp_login
+    otp_login(request, device)
+
     # Create JWT tokens after successful activation
     from rest_framework_simplejwt.tokens import RefreshToken
 

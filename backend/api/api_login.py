@@ -43,6 +43,7 @@ def otp_verify(request):
     from django.contrib.auth.models import User
     from django_otp.plugins.otp_totp.models import TOTPDevice
     from rest_framework_simplejwt.tokens import RefreshToken
+    from django_otp import login as otp_login  # ✅ Import OTP login
 
     user_id = request.data.get("user_id")
     token = request.data.get("token")
@@ -53,8 +54,11 @@ def otp_verify(request):
     if not device or not device.verify_token(token):
         return Response({"error": "Invalid code"}, status=400)
 
-    # ✅ ADD THIS LINE - Create session after successful OTP verification
+    # Create session after successful OTP verification
     login(request, user)
+
+    # ✅ Mark the user as OTP-verified in the session
+    otp_login(request, device)
 
     refresh = RefreshToken.for_user(user)
 
