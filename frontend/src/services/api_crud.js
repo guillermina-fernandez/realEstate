@@ -1,6 +1,9 @@
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 // Fetch all objects from one model
 export const fetchModelObjectsAPI = async (modelName, modelDepth) => {
-    const response = await fetch(`http://127.0.0.1:8000/api/${modelName}/${modelDepth}/`);
+    const response = await fetch(`${API_URL}/api/${modelName}/${modelDepth}/`);
 
     if (!response.ok) {
         let message = `Error ${response.status}`;
@@ -19,7 +22,7 @@ export const fetchModelObjectsAPI = async (modelName, modelDepth) => {
 
 // Fetch all objects from a related model
 export const fetchRelatedModelObjectsAPI = async (relatedModel, relatedModelDepth, relatedFieldName, modelId) => {
-    const response = await fetch(`http://127.0.0.1:8000/api/related/${relatedModel}/${relatedModelDepth}/${relatedFieldName}/${modelId}/`);
+    const response = await fetch(`${API_URL}/api/related/${relatedModel}/${relatedModelDepth}/${relatedFieldName}/${modelId}/`);
 
     if (!response.ok) {
         let message = `Error ${response.status}`;
@@ -39,7 +42,7 @@ export const fetchRelatedModelObjectsAPI = async (relatedModel, relatedModelDept
 
 // Fetch one object from a model
 export const fetchObjDataAPI = async (modelName, objId, modelDepth) => {
-    const response = await fetch(`http://127.0.0.1:8000/api/${modelName}/cod/${objId}/${modelDepth}/`);
+    const response = await fetch(`${API_URL}/api/${modelName}/cod/${objId}/${modelDepth}/`);
     if (!response.ok) {
         let message = `Error ${response.status}`;
         try {
@@ -59,7 +62,7 @@ export const fetchObjDataAPI = async (modelName, objId, modelDepth) => {
 
 // Create new record
 export const createObjDataAPI = async (modelName, objData, modelDepth) => {
-    const response = await fetch(`http://127.0.0.1:8000/api/create/${modelName}/${modelDepth}/`, {
+    const response = await fetch(`${API_URL}/api/create/${modelName}/${modelDepth}/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(objData)
@@ -87,7 +90,7 @@ export const createObjDataAPI = async (modelName, objData, modelDepth) => {
 
 // Update record:
 export const updateObjDataAPI = async (modelName, objId, objData, modelDepth) => {
-    const response = await fetch(`http://127.0.0.1:8000/api/update/${modelName}/${objId}/${modelDepth}/`, {
+    const response = await fetch(`${API_URL}/api/update/${modelName}/${objId}/${modelDepth}/`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(objData),
@@ -115,7 +118,7 @@ export const updateObjDataAPI = async (modelName, objId, objData, modelDepth) =>
 
 // Delete record:
 export const deleteObjAPI = async (modelName, objId) => {
-    const response = await fetch(`http://127.0.0.1:8000/api/delete/${modelName}/${objId}/`, {
+    const response = await fetch(`${API_URL}/api/delete/${modelName}/${objId}/`, {
         method: 'DELETE',
     });
 
@@ -135,7 +138,7 @@ export const deleteObjAPI = async (modelName, objId) => {
 
 // Fetch all objects from expenses or collects
 export const fetchBalanceDataAPI = async (reId) => {
-    const response = await fetch(`http://127.0.0.1:8000/api/propiedad/${reId}/balance/`);
+    const response = await fetch(`${API_URL}/api/propiedad/${reId}/balance/`);
 
     if (!response.ok) {
         let message = `Error ${response.status}`;

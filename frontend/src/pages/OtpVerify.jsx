@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function OtpVerify() {
     const { state } = useLocation();
     const userId = state.userId;
     const [token, setToken] = useState("");
 
     const handleVerify = async () => {
-        const res = await fetch("http://127.0.0.1:8000/api/otp/verify/", {
+        const res = await fetch(`${API_URL}/api/otp/verify/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ user_id: userId, token }),

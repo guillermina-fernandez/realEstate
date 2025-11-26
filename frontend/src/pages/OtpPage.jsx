@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function OtpSetup() {
     const { state } = useLocation();
     const userId = state.userId;
@@ -9,7 +11,7 @@ export default function OtpSetup() {
     const [token, setToken] = useState("");
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/otp/setup/", {
+        fetch(`${API_URL}/api/otp/setup/`, {
             method: "POST",
             credentials: "include", // send cookies!
         })
@@ -18,7 +20,7 @@ export default function OtpSetup() {
     }, []);
 
     const handleActivate = async () => {
-        const res = await fetch("http://127.0.0.1:8000/api/otp/activate/", {
+        const res = await fetch(`${API_URL}/api/otp/activate/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",

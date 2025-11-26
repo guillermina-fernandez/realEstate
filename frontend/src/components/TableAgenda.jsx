@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useDataContext } from "../context/DataContext";
 import { spanishDate } from "../myScripts/myMainScript";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function TableAgenda() {
     const { modelData, handleDelete, setEditObj, openModal } = useDataContext();
     const [showData, setShowData] = useState([])
@@ -90,7 +92,7 @@ function TableAgenda() {
         }
         if (accepted) {
             const processAgenda = async () => {
-                const response = await fetch(`http://127.0.0.1:8000/api/agenda/cod/${agendaId}/`);
+                const response = await fetch(`${API_URL}/api/agenda/cod/${agendaId}/`);
                 if (!response.ok) {
                     let result;
                     try {

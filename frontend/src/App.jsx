@@ -12,6 +12,7 @@ import OtpPage from './pages/OtpPage'
 import OtpSetup from './pages/OtpPage'
 import OtpVerify from './pages/OtpVerify'
 
+const API_URL = import.meta.env.VITE_API_URL;
 
 function isTokenExpired(token) {
   try {
@@ -30,7 +31,7 @@ async function refreshAccessToken() {
   if (!refresh) return false;
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/api/token/refresh/", {
+    const res = await fetch("${API_URL}/api/token/refresh/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh }),

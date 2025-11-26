@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Login() {
     const [passType, setPassType] = useState('password');
@@ -17,7 +18,7 @@ function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        const res = await fetch("http://127.0.0.1:8000/api/login/", {
+        const res = await fetch(`${API_URL}/api/login/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
