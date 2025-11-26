@@ -28,7 +28,7 @@ export default function OtpVerify() {
         <div>
             <h2>Enter OTP code</h2>
             <input value={token} onChange={(e)=>setToken(e.target.value)} />
-            <button onClick={handleVerify}>Verify</button>
+            <button className="ms-3" onClick={handleVerify}>Verify</button>
         </div>
     );
 }
