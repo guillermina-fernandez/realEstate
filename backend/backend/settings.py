@@ -179,6 +179,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'backend.authentication.CsrfExemptSessionAuthentication',
     ),
     'EXCEPTION_HANDLER': 'common.custom_exception_handler.custom_exception_handler',
     'DEFAULT_LANGUAGE': 'es',
@@ -210,13 +211,6 @@ if ENV == "production":
     # Prevent JavaScript cookie access
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
-
-    # ✅ ADD THESE LINES - Critical for cross-origin session cookies
-    SESSION_COOKIE_SAMESITE = 'None'  # Allow cross-origin
-    CSRF_COOKIE_SAMESITE = 'None'  # Allow cross-origin
-
-    # ✅ ADD THIS - Specify the cookie domain
-    SESSION_COOKIE_DOMAIN = os.getenv('SESSION_COOKIE_DOMAIN')
 
     # HSTS - strict HTTPS
     SECURE_HSTS_SECONDS = 31536000

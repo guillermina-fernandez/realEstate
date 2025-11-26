@@ -6,10 +6,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.core.cache import cache
+from rest_framework.authentication import SessionAuthentication  # ✅ ADD THIS
 
+OTP_MAX_TRIES = 5  # Number of allowed failed attempts
+OTP_LOCK_MINUTES = 10  # Lockout duration
 
-OTP_MAX_TRIES = 5          # Number of allowed failed attempts
-OTP_LOCK_MINUTES = 10      # Lockout duration
 
 def _is_locked_out(user_id):
     """Check if user is OTP locked out."""
@@ -33,9 +34,13 @@ def _reset_fail_count(user_id):
     cache.delete(f"otp_lock_{user_id}")
 
 
+# ✅ CHANGE: Remove @permission_classes, manually check authentication
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def otp_setup(request):
+    # ✅ Manual authentication check
+    if not request.user.is_authenticated:
+        return Response({"error": "Unauthorized"}, status=401)
+
     user = request.user
 
     # Delete old unconfirmed devices
@@ -65,9 +70,13 @@ def otp_setup(request):
     })
 
 
+# ✅ CHANGE: Remove @permission_classes, manually check authentication
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def otp_activate(request):
+    # ✅ Manual authentication check
+    if not request.user.is_authenticated:
+        return Response({"error": "Unauthorized"}, status=401)
+
     user = request.user
 
     # Check lockout
@@ -99,7 +108,7 @@ def otp_activate(request):
     # Reset fail counter
     _reset_fail_count(user.id)
 
-    # ✅ ADD THESE LINES - Create JWT tokens after successful activation
+    # Create JWT tokens after successful activation
     from rest_framework_simplejwt.tokens import RefreshToken
 
     refresh = RefreshToken.for_user(user)
@@ -109,3 +118,4 @@ def otp_activate(request):
         "access": str(refresh.access_token),
         "refresh": str(refresh)
     })
+
