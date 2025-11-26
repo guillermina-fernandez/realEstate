@@ -46,6 +46,6 @@ urlpatterns = [
 
 
 urlpatterns += [
-    re_path(r"^(?:.*)/?$", react_app),
+    re_path(r"^(?!static/)(?!assets/).*$", react_app),
 ]
 
