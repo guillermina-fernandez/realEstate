@@ -6,48 +6,12 @@ import { DataProvider } from './context/DataContext'
 import RealEstate from './pages/RealEstate'
 import NavBar from './components/NavBar'
 import Agenda from './pages/Agenda'
-import Login from './pages/Login';
-import { ToastContainer } from 'react-toastify';
+import Login from './pages/Login'
+import { ToastContainer } from 'react-toastify'
 import OtpPage from './pages/OtpPage'
 import OtpSetup from './pages/OtpPage'
 import OtpVerify from './pages/OtpVerify'
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-function isTokenExpired(token) {
-  try {
-    const [, payload] = token.split('.');
-    const decoded = JSON.parse(atob(payload));
-    const now = Date.now() / 1000;
-    return decoded.exp < now;
-  } catch {
-    return true;
-  }
-}
-
-
-async function refreshAccessToken() {
-  const refresh = localStorage.getItem("refresh");
-  if (!refresh) return false;
-
-  try {
-    const res = await fetch(`${API_URL}/api/token/refresh/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh }),
-    });
-
-    if (!res.ok) throw new Error("refresh failed");
-    const data = await res.json();
-    localStorage.setItem("access", data.access);
-    return true;
-  } catch {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    return false;
-  }
-}
-
+import { isTokenExpired, refreshAccessToken } from './services/api_utils'
 
 function PrivateRoute({ logged, children }) {
   return logged ? children : <Navigate to="/" replace />;
@@ -55,6 +19,7 @@ function PrivateRoute({ logged, children }) {
 
 function App() {
   const [logged, setLogged] = useState(!!localStorage.getItem('access'));
+
   const crudRoutes = [
     { path: '/propietario', modelName: 'propietario', modelDepth: 0, modelId: null, relatedModel: null, relatedModelDepth: null, relatedFieldName: null },
     { path: '/inquilino', modelName: 'inquilino', modelDepth: 0, modelId: null, relatedModel: null, relatedModelDepth: null, relatedFieldName: null },
@@ -76,8 +41,12 @@ function App() {
       }
 
       if (isTokenExpired(access)) {
-        const refreshed = await refreshAccessToken();
-        setLogged(refreshed);
+        try {
+          await refreshAccessToken();
+          setLogged(true);
+        } catch {
+          setLogged(false);
+        }
       } else {
         setLogged(true);
       }
@@ -85,12 +54,14 @@ function App() {
 
     checkAuth();
 
+    // Check every minute instead of every 10 minutes
     refreshInterval = setInterval(async () => {
       const access = localStorage.getItem("access");
       const refresh = localStorage.getItem("refresh");
 
       if (!access || !refresh) {
         clearInterval(refreshInterval);
+        setLogged(false);
         return;
       }
 
@@ -100,7 +71,8 @@ function App() {
         const now = Date.now() / 1000;
         const timeLeft = decoded.exp - now;
 
-        if (timeLeft < 120) {
+        // Refresh when less than 5 minutes left
+        if (timeLeft < 300) {
           await refreshAccessToken();
         }
       } catch {
@@ -109,13 +81,32 @@ function App() {
         localStorage.removeItem("refresh");
         setLogged(false);
       }
-    }, 1000 * 60 * 10);
+    }, 1000 * 60); // Check every 1 minute
+
+    // Activity-based token refresh
+    const handleActivity = async () => {
+      const access = localStorage.getItem("access");
+      if (access && isTokenExpired(access)) {
+        try {
+          await refreshAccessToken();
+          setLogged(true);
+        } catch {
+          setLogged(false);
+        }
+      }
+    };
+
+    // Refresh on user activity (debounced via the isTokenExpired check)
+    window.addEventListener("click", handleActivity);
+    window.addEventListener("keydown", handleActivity);
 
     const syncAuth = () => setLogged(!!localStorage.getItem("access"));
     window.addEventListener("storage", syncAuth);
 
     return () => {
       window.removeEventListener("storage", syncAuth);
+      window.removeEventListener("click", handleActivity);
+      window.removeEventListener("keydown", handleActivity);
       clearInterval(refreshInterval);
     };
   }, []);
@@ -175,4 +166,3 @@ function App() {
 }
 
 export default App
-
